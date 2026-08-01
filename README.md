@@ -13,7 +13,13 @@ static site (Vite + vanilla JS) that is the on-ramp for Workstreams B and C.
 
 - **CI:** GitHub Actions runs lint + test + build on every push/PR to `main`
   (see `.github/workflows/ci.yml`).
-- **Deploy:** `dist/` is deployed to Netlify manually via `netlify deploy --prod --dir dist`.
+- **Deploy:** pushes to `main` are automatically built and deployed to Netlify
+  by GitHub Actions (see `.github/workflows/deploy.yml`, `netlify.toml`).
+- **Manual deploy** (fallback):
+  ```bash
+  npm run verify
+  netlify deploy --prod --dir dist --site 6ac121cd-83ce-43df-8d10-babe4a92fa70
+  ```
 
 ## Prerequisites
 
