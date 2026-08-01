@@ -1,0 +1,2205 @@
+openapi: 3.0.3
+info:
+  title: Creative Digital Company — Public API
+  description: |
+    REST API for the Creative Digital Company platform.
+
+    Conventions (see [API Specification](/CRE/issues/CRE-6#document-api-specification)):
+    - JSON over HTTPS, camelCase field names.
+    - Authentication via `Authorization: Bearer <accessToken>` (JWT). Refresh tokens are
+      exchanged via `POST /auth/refresh`.
+    - All identifiers are CUID strings.
+    - Pagination envelope: `{ "data": [...], "meta": { "page", "pageSize", "total" } }`.
+    - Standard error body: `{ "statusCode", "error", "message", "path", "timestamp", "requestId" }`.
+    - Request/response schemas are generated from the backend DTOs (NestJS + class-validator),
+      so this document is the single source of truth for the API contract.
+  version: 1.0.0
+  contact:
+    name: CTO — Creative Digital Company
+servers:
+  - url: https://api.creative-digital-company.netlify.app
+    description: Production
+  - url: https://staging.creative-digital-company.netlify.app
+    description: Staging
+tags:
+  - name: Authentication
+    description: Sign-up, login, token refresh, email verification, password reset.
+  - name: Users
+    description: User accounts, profile, and roles.
+  - name: Companies
+    description: Company/organization accounts, membership, and roles.
+  - name: Documents
+    description: Documents and versioned revisions.
+  - name: AI
+    description: AI generation, chat, and asynchronous jobs.
+  - name: Payments
+    description: Plans, subscriptions, checkout, and invoices.
+  - name: Notifications
+    description: In-app notifications and preferences.
+  - name: Admin
+    description: "Admin-only operations: metrics, users, companies, flags, audit log."
+
+paths:
+  # ---------------------------------------------------------------- Authentication
+  /auth/register:
+    post:
+      tags: [Authentication]
+      summary: Register a new user account
+      operationId: register
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: Account created. Email verification required.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /auth/login:
+    post:
+      tags: [Authentication]
+      summary: Authenticate and receive tokens
+      operationId: login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /auth/refresh:
+    post:
+      tags: [Authentication]
+      summary: Exchange a refresh token for a new access token pair
+      operationId: refreshToken
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [refreshToken]
+              properties:
+                refreshToken:
+                  type: string
+                  description: The rotating refresh token issued at login.
+      responses:
+        '200':
+          description: New token pair issued
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /auth/logout:
+    post:
+      tags: [Authentication]
+      summary: Revoke the current refresh token (and session)
+      operationId: logout
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [refreshToken]
+              properties:
+                refreshToken:
+                  type: string
+      responses:
+        '204':
+          description: Logged out, session revoked
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /auth/verify-email:
+    post:
+      tags: [Authentication]
+      summary: Verify an email address with a signed token
+      operationId: verifyEmail
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [token]
+              properties:
+                token:
+                  type: string
+                  description: Verification token from the verification email.
+      responses:
+        '204':
+          description: Email verified
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /auth/verify-email/resend:
+    post:
+      tags: [Authentication]
+      summary: Resend the email verification message
+      operationId: resendVerification
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email]
+              properties:
+                email:
+                  type: string
+                  format: email
+      responses:
+        '202':
+          description: Verification email (re)sent if the account exists
+        '429':
+          $ref: '#/components/responses/RateLimited'
+
+  /auth/forgot-password:
+    post:
+      tags: [Authentication]
+      summary: Request a password reset email
+      operationId: forgotPassword
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email]
+              properties:
+                email:
+                  type: string
+                  format: email
+      responses:
+        '202':
+          description: Reset email sent if the account exists (no account enumeration)
+        '429':
+          $ref: '#/components/responses/RateLimited'
+
+  /auth/reset-password:
+    post:
+      tags: [Authentication]
+      summary: Set a new password with a signed reset token
+      operationId: resetPassword
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [token, newPassword]
+              properties:
+                token:
+                  type: string
+                newPassword:
+                  $ref: '#/components/schemas/Password'
+      responses:
+        '204':
+          description: Password updated, all sessions revoked
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  # ---------------------------------------------------------------- Users
+  /users/me:
+    get:
+      tags: [Users]
+      summary: Get the authenticated user's profile
+      operationId: getMe
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Current profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+    patch:
+      tags: [Users]
+      summary: Update the authenticated user's profile
+      operationId: updateMe
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUserRequest'
+      responses:
+        '200':
+          description: Updated profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /users/me/password:
+    patch:
+      tags: [Users]
+      summary: Change the authenticated user's password
+      operationId: changePassword
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [currentPassword, newPassword]
+              properties:
+                currentPassword:
+                  type: string
+                newPassword:
+                  $ref: '#/components/schemas/Password'
+      responses:
+        '204':
+          description: Password changed, all sessions revoked
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /users/{id}:
+    get:
+      tags: [Users]
+      summary: Get a user profile by ID
+      operationId: getUser
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+      responses:
+        '200':
+          description: User profile (redacted fields for non-company members)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /users:
+    get:
+      tags: [Users]
+      summary: Search users (company-scoped)
+      operationId: listUsers
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/Query'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+      responses:
+        '200':
+          description: Paginated user results
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Paginated'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  # ---------------------------------------------------------------- Companies
+  /companies:
+    post:
+      tags: [Companies]
+      summary: Create a company (creator becomes owner)
+      operationId: createCompany
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCompanyRequest'
+      responses:
+        '201':
+          description: Company created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Company'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+    get:
+      tags: [Companies]
+      summary: List companies the user belongs to
+      operationId: listCompanies
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+      responses:
+        '200':
+          description: Paginated companies
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Paginated'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Company'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /companies/{id}:
+    get:
+      tags: [Companies]
+      summary: Get a company by ID
+      operationId: getCompany
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/CompanyId'
+      responses:
+        '200':
+          description: Company
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Company'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+    patch:
+      tags: [Companies]
+      summary: Update company details (owner/admin only)
+      operationId: updateCompany
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/CompanyId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCompanyRequest'
+      responses:
+        '200':
+          description: Updated company
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Company'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /companies/{id}/members:
+    get:
+      tags: [Companies]
+      summary: List company members with roles
+      operationId: listCompanyMembers
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/CompanyId'
+      responses:
+        '200':
+          description: Company members
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CompanyMember'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /companies/{id}/members:
+    post:
+      tags: [Companies]
+      summary: Invite a member by email (owner/admin only)
+      operationId: inviteMember
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/CompanyId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, role]
+              properties:
+                email:
+                  type: string
+                  format: email
+                role:
+                  $ref: '#/components/schemas/CompanyRole'
+      responses:
+        '201':
+          description: Invitation sent
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Invitation'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+  /companies/{id}/members/{userId}:
+    patch:
+      tags: [Companies]
+      summary: Update a member's role (owner/admin only)
+      operationId: updateMemberRole
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/CompanyId'
+        - $ref: '#/components/parameters/UserId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [role]
+              properties:
+                role:
+                  $ref: '#/components/schemas/CompanyRole'
+      responses:
+        '200':
+          description: Member updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompanyMember'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      tags: [Companies]
+      summary: Remove a member (owner/admin only; owner cannot remove self)
+      operationId: removeMember
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/CompanyId'
+        - $ref: '#/components/parameters/UserId'
+      responses:
+        '204':
+          description: Member removed
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /companies/{id}/invitations/{invitationId}/accept:
+    post:
+      tags: [Companies]
+      summary: Accept an invitation
+      operationId: acceptInvitation
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/CompanyId'
+        - name: invitationId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Invitation accepted, membership active
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompanyMember'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+  # ---------------------------------------------------------------- Documents
+  /documents:
+    post:
+      tags: [Documents]
+      summary: Create a document (metadata + content)
+      operationId: createDocument
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDocumentRequest'
+      responses:
+        '201':
+          description: Document created (revision 1)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Document'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+    get:
+      tags: [Documents]
+      summary: List documents (company-scoped, with filters)
+      operationId: listDocuments
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: companyId
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: projectId
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: status
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/DocumentStatus'
+        - name: q
+          in: query
+          required: false
+          schema:
+            type: string
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+      responses:
+        '200':
+          description: Paginated documents
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Paginated'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Document'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /documents/{id}:
+    get:
+      tags: [Documents]
+      summary: Get a document by ID (latest revision)
+      operationId: getDocument
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/DocumentId'
+      responses:
+        '200':
+          description: Document with latest revision
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Document'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+    patch:
+      tags: [Documents]
+      summary: Update a document (creates a new revision)
+      operationId: updateDocument
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/DocumentId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateDocumentRequest'
+      responses:
+        '200':
+          description: Updated document (new revision)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Document'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+    delete:
+      tags: [Documents]
+      summary: Soft-delete a document
+      operationId: deleteDocument
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/DocumentId'
+      responses:
+        '204':
+          description: Document soft-deleted
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /documents/{id}/revisions:
+    get:
+      tags: [Documents]
+      summary: List document revisions
+      operationId: listDocumentRevisions
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/DocumentId'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+      responses:
+        '200':
+          description: Paginated revisions
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Paginated'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/DocumentRevision'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /documents/{id}/revisions/{revisionId}:
+    get:
+      tags: [Documents]
+      summary: Get a specific document revision
+      operationId: getDocumentRevision
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/DocumentId'
+        - name: revisionId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Document revision
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentRevision'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  # ---------------------------------------------------------------- AI
+  /ai/generate:
+    post:
+      tags: [AI]
+      summary: Run a synchronous AI generation (text/image)
+      operationId: aiGenerate
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AiGenerateRequest'
+      responses:
+        '200':
+          description: Generation result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AiResult'
+        '202':
+          description: Accepted asynchronously (see job response)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AiJob'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /ai/chat:
+    post:
+      tags: [AI]
+      summary: Send a message in an AI copilot conversation
+      operationId: aiChat
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AiChatRequest'
+      responses:
+        '200':
+          description: Assistant reply
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AiChatResponse'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /ai/jobs:
+    post:
+      tags: [AI]
+      summary: Enqueue an asynchronous AI job
+      operationId: createAiJob
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AiGenerateRequest'
+      responses:
+        '202':
+          description: Job enqueued
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AiJob'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+    get:
+      tags: [AI]
+      summary: List the user's AI jobs
+      operationId: listAiJobs
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+      responses:
+        '200':
+          description: Paginated jobs
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Paginated'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/AiJob'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /ai/jobs/{id}:
+    get:
+      tags: [AI]
+      summary: Get an AI job and its result
+      operationId: getAiJob
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Job state and optional result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AiJob'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  # ---------------------------------------------------------------- Payments
+  /payments/plans:
+    get:
+      tags: [Payments]
+      summary: List available subscription plans
+      operationId: listPlans
+      responses:
+        '200':
+          description: Available plans
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Plan'
+
+  /payments/checkout:
+    post:
+      tags: [Payments]
+      summary: Create a checkout session for a plan
+      operationId: createCheckout
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [planId]
+              properties:
+                planId:
+                  type: string
+                companyId:
+                  type: string
+                  description: Company the subscription applies to.
+                successUrl:
+                  type: string
+                  format: uri
+                cancelUrl:
+                  type: string
+                  format: uri
+      responses:
+        '200':
+          description: Checkout session created
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [checkoutUrl]
+                properties:
+                  checkoutUrl:
+                    type: string
+                    format: uri
+                  sessionId:
+                    type: string
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /payments/subscription:
+    get:
+      tags: [Payments]
+      summary: Get the current subscription
+      operationId: getSubscription
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: companyId
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Current subscription (or none)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscription'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+    patch:
+      tags: [Payments]
+      summary: Change or cancel the subscription (owner/billing admin only)
+      operationId: updateSubscription
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                planId:
+                  type: string
+                action:
+                  type: string
+                  enum: [change_plan, cancel, reactivate]
+      responses:
+        '200':
+          description: Updated subscription
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscription'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /payments/invoices:
+    get:
+      tags: [Payments]
+      summary: List invoices for the current user/company
+      operationId: listInvoices
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: companyId
+          in: query
+          required: true
+          schema:
+            type: string
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+      responses:
+        '200':
+          description: Paginated invoices
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Paginated'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Invoice'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /payments/invoices/{id}:
+    get:
+      tags: [Payments]
+      summary: Get an invoice (or its PDF)
+      operationId: getInvoice
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: format
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [json, pdf]
+            default: json
+      responses:
+        '200':
+          description: Invoice data or PDF binary
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Invoice'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /payments/webhooks:
+    post:
+      tags: [Payments]
+      summary: Provider webhook endpoint (signed, public)
+      operationId: paymentWebhook
+      x-public: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              description: Provider-signed event payload (e.g., Stripe event).
+      responses:
+        '200':
+          description: Webhook processed
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  # ---------------------------------------------------------------- Notifications
+  /notifications:
+    get:
+      tags: [Notifications]
+      summary: List the user's notifications
+      operationId: listNotifications
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: read
+          in: query
+          required: false
+          schema:
+            type: boolean
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+      responses:
+        '200':
+          description: Paginated notifications
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Paginated'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Notification'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /notifications/unread-count:
+    get:
+      tags: [Notifications]
+      summary: Count unread notifications
+      operationId: unreadNotificationCount
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Unread count
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [count]
+                properties:
+                  count:
+                    type: integer
+                    minimum: 0
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /notifications/{id}/read:
+    post:
+      tags: [Notifications]
+      summary: Mark one notification as read
+      operationId: markNotificationRead
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Marked as read
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /notifications/read-all:
+    post:
+      tags: [Notifications]
+      summary: Mark all notifications as read
+      operationId: markAllNotificationsRead
+      security:
+        - bearerAuth: []
+      responses:
+        '204':
+          description: All marked as read
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /notifications/preferences:
+    get:
+      tags: [Notifications]
+      summary: Get the user's notification preferences
+      operationId: getNotificationPreferences
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Preferences
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationPreferences'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+    patch:
+      tags: [Notifications]
+      summary: Update notification preferences
+      operationId: updateNotificationPreferences
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NotificationPreferences'
+      responses:
+        '200':
+          description: Updated preferences
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationPreferences'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  # ---------------------------------------------------------------- Admin
+  /admin/metrics:
+    get:
+      tags: [Admin]
+      summary: Company-wide operational metrics
+      operationId: adminMetrics
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Metrics snapshot
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminMetrics'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /admin/users:
+    get:
+      tags: [Admin]
+      summary: List all users
+      operationId: adminListUsers
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/Query'
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [active, suspended, pending_verification]
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+      responses:
+        '200':
+          description: Paginated users
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Paginated'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/User'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /admin/users/{id}:
+    patch:
+      tags: [Admin]
+      summary: Suspend, activate, or update a user (admin only)
+      operationId: adminUpdateUser
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  enum: [active, suspended]
+                roles:
+                  type: array
+                  items:
+                    type: string
+                  description: Global roles to grant/revoke.
+      responses:
+        '200':
+          description: Updated user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /admin/companies:
+    get:
+      tags: [Admin]
+      summary: List all companies
+      operationId: adminListCompanies
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+      responses:
+        '200':
+          description: Paginated companies
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Paginated'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Company'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /admin/companies/{id}:
+    patch:
+      tags: [Admin]
+      summary: Suspend, activate, or update a company (admin only)
+      operationId: adminUpdateCompany
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/CompanyId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  enum: [active, suspended]
+                tier:
+                  type: string
+                  enum: [free, pro, enterprise]
+      responses:
+        '200':
+          description: Updated company
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Company'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /admin/feature-flags:
+    get:
+      tags: [Admin]
+      summary: List feature flags
+      operationId: listFeatureFlags
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Feature flags
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/FeatureFlag'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /admin/feature-flags/{key}:
+    patch:
+      tags: [Admin]
+      summary: Enable/disable or update a feature flag (admin only)
+      operationId: updateFeatureFlag
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: key
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateFeatureFlagRequest'
+      responses:
+        '200':
+          description: Updated flag
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FeatureFlag'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /admin/audit-log:
+    get:
+      tags: [Admin]
+      summary: Query the audit log
+      operationId: adminAuditLog
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: actorUserId
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: companyId
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: action
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: from
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: to
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+      responses:
+        '200':
+          description: Paginated audit entries
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Paginated'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/AuditLogEntry'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Access token returned by `POST /auth/login` or `POST /auth/refresh`.
+
+  parameters:
+    Page:
+      name: page
+      in: query
+      description: 1-based page number.
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    PageSize:
+      name: pageSize
+      in: query
+      description: Number of items per page.
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    Query:
+      name: q
+      in: query
+      description: Free-text search term.
+      schema:
+        type: string
+    UserId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        description: CUID of the user.
+    CompanyId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        description: CUID of the company.
+    DocumentId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        description: CUID of the document.
+
+  responses:
+    BadRequest:
+      description: Invalid or malformed request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: Missing, invalid, or expired credentials
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Forbidden:
+      description: Authenticated but insufficient permissions
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Conflict:
+      description: Resource already exists or state conflict
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    RateLimited:
+      description: Too many requests
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    PaymentRequired:
+      description: A paid plan or valid billing method is required
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+  schemas:
+    # ------------------------------------------------------------ common
+    Error:
+      type: object
+      required: [statusCode, error, message, timestamp, requestId]
+      properties:
+        statusCode:
+          type: integer
+        error:
+          type: string
+          example: Bad Request
+        message:
+          oneOf:
+            - type: string
+            - type: array
+              items:
+                type: string
+        path:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        requestId:
+          type: string
+          description: Correlation ID propagated through logs.
+
+    Paginated:
+      type: object
+      required: [data, meta]
+      properties:
+        data:
+          type: array
+        meta:
+          type: object
+          required: [page, pageSize, total]
+          properties:
+            page:
+              type: integer
+            pageSize:
+              type: integer
+            total:
+              type: integer
+
+    Password:
+      type: string
+      minLength: 8
+      maxLength: 128
+      format: password
+
+    # ------------------------------------------------------------ auth
+    AuthResponse:
+      type: object
+      required: [accessToken, refreshToken, expiresIn, user]
+      properties:
+        accessToken:
+          type: string
+        refreshToken:
+          type: string
+        expiresIn:
+          type: integer
+          description: Access token lifetime in seconds.
+        user:
+          $ref: '#/components/schemas/User'
+
+    RegisterRequest:
+      type: object
+      required: [email, password, fullName]
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          $ref: '#/components/schemas/Password'
+        fullName:
+          type: string
+          minLength: 1
+          maxLength: 120
+        companyName:
+          type: string
+          description: Optionally create a company during sign-up.
+
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+
+    # ------------------------------------------------------------ users
+    User:
+      type: object
+      required: [id, email, fullName, createdAt]
+      properties:
+        id:
+          type: string
+        email:
+          type: string
+          format: email
+        fullName:
+          type: string
+        avatarUrl:
+          type: string
+          format: uri
+          nullable: true
+        emailVerified:
+          type: boolean
+        status:
+          type: string
+          enum: [active, suspended, pending_verification]
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    UpdateUserRequest:
+      type: object
+      properties:
+        fullName:
+          type: string
+          minLength: 1
+          maxLength: 120
+        avatarUrl:
+          type: string
+          format: uri
+          nullable: true
+
+    # ------------------------------------------------------------ companies
+    Company:
+      type: object
+      required: [id, name, status, createdAt]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        slug:
+          type: string
+        logoUrl:
+          type: string
+          format: uri
+          nullable: true
+        status:
+          type: string
+          enum: [active, suspended]
+        tier:
+          type: string
+          enum: [free, pro, enterprise]
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    CreateCompanyRequest:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 120
+        slug:
+          type: string
+          pattern: '^[a-z0-9-]+$'
+
+    UpdateCompanyRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 120
+        slug:
+          type: string
+          pattern: '^[a-z0-9-]+$'
+        logoUrl:
+          type: string
+          format: uri
+          nullable: true
+
+    CompanyRole:
+      type: string
+      enum: [owner, admin, editor, viewer, billing]
+
+    CompanyMember:
+      type: object
+      required: [userId, companyId, role, status]
+      properties:
+        userId:
+          type: string
+        companyId:
+          type: string
+        role:
+          $ref: '#/components/schemas/CompanyRole'
+        status:
+          type: string
+          enum: [active, invited]
+        user:
+          $ref: '#/components/schemas/User'
+
+    Invitation:
+      type: object
+      required: [id, companyId, email, role, status, expiresAt]
+      properties:
+        id:
+          type: string
+        companyId:
+          type: string
+        email:
+          type: string
+          format: email
+        role:
+          $ref: '#/components/schemas/CompanyRole'
+        status:
+          type: string
+          enum: [pending, accepted, expired, revoked]
+        expiresAt:
+          type: string
+          format: date-time
+
+    # ------------------------------------------------------------ documents
+    DocumentStatus:
+      type: string
+      enum: [draft, in_review, approved, archived]
+
+    Document:
+      type: object
+      required: [id, companyId, title, status, createdAt]
+      properties:
+        id:
+          type: string
+        companyId:
+          type: string
+        projectId:
+          type: string
+          nullable: true
+        title:
+          type: string
+        status:
+          $ref: '#/components/schemas/DocumentStatus'
+        contentType:
+          type: string
+          enum: [markdown, text, html]
+          default: markdown
+        currentRevision:
+          $ref: '#/components/schemas/DocumentRevision'
+        createdBy:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        deletedAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: Non-null when soft-deleted (hidden from list queries).
+
+    CreateDocumentRequest:
+      type: object
+      required: [companyId, title]
+      properties:
+        companyId:
+          type: string
+        projectId:
+          type: string
+        title:
+          type: string
+          minLength: 1
+          maxLength: 240
+        contentType:
+          type: string
+          enum: [markdown, text, html]
+          default: markdown
+        content:
+          type: string
+          default: ''
+
+    UpdateDocumentRequest:
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 240
+        content:
+          type: string
+        contentType:
+          type: string
+          enum: [markdown, text, html]
+        status:
+          $ref: '#/components/schemas/DocumentStatus'
+        baseRevisionId:
+          type: string
+          description: |
+            Optimistic-concurrency guard: the revision the client last saw. If the document
+            changed, the server returns 409 and the client must re-fetch.
+
+    DocumentRevision:
+      type: object
+      required: [id, documentId, revisionNumber, content, createdAt]
+      properties:
+        id:
+          type: string
+        documentId:
+          type: string
+        revisionNumber:
+          type: integer
+          minimum: 1
+        content:
+          type: string
+        createdBy:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+
+    # ------------------------------------------------------------ ai
+    AiGenerateRequest:
+      type: object
+      required: [kind, prompt]
+      properties:
+        kind:
+          type: string
+          enum: [text, image, code, summary]
+        prompt:
+          type: string
+        model:
+          type: string
+          nullable: true
+        options:
+          type: object
+          additionalProperties: true
+        companyId:
+          type: string
+        documentId:
+          type: string
+          nullable: true
+
+    AiResult:
+      type: object
+      required: [id, kind, output]
+      properties:
+        id:
+          type: string
+        kind:
+          type: string
+        output:
+          type: object
+        usage:
+          type: object
+          properties:
+            inputTokens:
+              type: integer
+            outputTokens:
+              type: integer
+
+    AiChatRequest:
+      type: object
+      required: [message]
+      properties:
+        message:
+          type: string
+        conversationId:
+          type: string
+          nullable: true
+        documentId:
+          type: string
+          nullable: true
+        companyId:
+          type: string
+
+    AiChatResponse:
+      type: object
+      required: [conversationId, message]
+      properties:
+        conversationId:
+          type: string
+        message:
+          type: string
+        usage:
+          type: object
+
+    AiJob:
+      type: object
+      required: [id, kind, status, createdAt]
+      properties:
+        id:
+          type: string
+        kind:
+          type: string
+        status:
+          type: string
+          enum: [queued, running, succeeded, failed, cancelled]
+        result:
+          $ref: '#/components/schemas/AiResult'
+          nullable: true
+        error:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    # ------------------------------------------------------------ payments
+    Plan:
+      type: object
+      required: [id, name, priceMonthly, currency]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        priceMonthly:
+          type: number
+        currency:
+          type: string
+          example: USD
+        features:
+          type: array
+          items:
+            type: string
+
+    Subscription:
+      type: object
+      required: [id, companyId, status, currentPeriodEnd]
+      properties:
+        id:
+          type: string
+        companyId:
+          type: string
+        planId:
+          type: string
+        status:
+          type: string
+          enum: [trialing, active, past_due, cancelled, incomplete]
+        currentPeriodStart:
+          type: string
+          format: date-time
+        currentPeriodEnd:
+          type: string
+          format: date-time
+        cancelAtPeriodEnd:
+          type: boolean
+
+    Invoice:
+      type: object
+      required: [id, companyId, amountDue, status, createdAt]
+      properties:
+        id:
+          type: string
+        companyId:
+          type: string
+        amountDue:
+          type: number
+        amountPaid:
+          type: number
+        status:
+          type: string
+          enum: [draft, open, paid, void, uncollectible]
+        periodStart:
+          type: string
+          format: date-time
+        periodEnd:
+          type: string
+          format: date-time
+        pdfUrl:
+          type: string
+          format: uri
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+
+    # ------------------------------------------------------------ notifications
+    Notification:
+      type: object
+      required: [id, type, title, read, createdAt]
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+          enum: [system, ai_job, mention, invitation, payment, review]
+        title:
+          type: string
+        body:
+          type: string
+        read:
+          type: boolean
+        readAt:
+          type: string
+          format: date-time
+          nullable: true
+        link:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+
+    NotificationPreferences:
+      type: object
+      required: [channels]
+      properties:
+        channels:
+          type: object
+          additionalProperties:
+            type: object
+            properties:
+              email:
+                type: boolean
+              push:
+                type: boolean
+        mutedTypes:
+          type: array
+          items:
+            type: string
+
+    # ------------------------------------------------------------ admin
+    AdminMetrics:
+      type: object
+      required: [users, companies, documents, revenue, generatedAt]
+      properties:
+        users:
+          type: object
+          properties:
+            total:
+              type: integer
+            active:
+              type: integer
+        companies:
+          type: object
+          properties:
+            total:
+              type: integer
+            active:
+              type: integer
+        documents:
+          type: object
+          properties:
+            total:
+              type: integer
+        revenue:
+          type: object
+          properties:
+            mrr:
+              type: number
+            total:
+              type: number
+        generatedAt:
+          type: string
+          format: date-time
+
+    FeatureFlag:
+      type: object
+      required: [key, enabled]
+      properties:
+        key:
+          type: string
+        enabled:
+          type: boolean
+        description:
+          type: string
+        updatedAt:
+          type: string
+          format: date-time
+
+    UpdateFeatureFlagRequest:
+      type: object
+      properties:
+        enabled:
+          type: boolean
+        description:
+          type: string
+
+    AuditLogEntry:
+      type: object
+      required: [id, action, actorUserId, createdAt]
+      properties:
+        id:
+          type: string
+        action:
+          type: string
+        actorUserId:
+          type: string
+        targetType:
+          type: string
+        targetId:
+          type: string
+        changes:
+          type: object
+          additionalProperties: true
+        requestId:
+          type: string
+        ip:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
