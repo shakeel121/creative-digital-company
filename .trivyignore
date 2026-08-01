@@ -1,6 +1,10 @@
-# Trivy ignore file.
-# Entries here are accepted, documented risks that were reviewed by the owning
-# team. Every entry MUST reference the tracking issue/justification in
-# docs/CICD_SECURITY_SCANNING.md. Format: one CVE/GHSA id per line.
-# Example:
-# CVE-2099-99999  # dev-only transitive dep, no prod exposure, tracked in vuln-mgmt
+# Trivy ignore file — risk acceptance register (SecLead sign-off required).
+# Entries here are ACCEPTED risks, not silence. Every entry MUST reference a
+# tracking ticket with owner, reason, and a re-evaluation date. The CI step
+# scripts/validate-risk-acceptance.js fails the build on any untracked entry.
+# See docs/VULNERABILITY_MANAGEMENT.md §4 and docs/CICD_SECURITY_SCANNING.md §2.
+#
+# Format (one CVE/GHSA per line; tracking inline or on the following line):
+# CVE-2099-99999  # tracking: CRE-000 # dev-only transitive dep, no prod exposure, re-eval 2026-11-01
+# GHSA-xxxx-xxxx-xxxx
+# # tracking: CRE-000 # second example, reason, re-eval 2026-11-01

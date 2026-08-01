@@ -36,9 +36,12 @@ Findings from all SARIF-producing tools are uploaded to GitHub code scanning
   priority. Trivy runs with `ignore-unfixed: true` — **unfixed upstream vulnerabilities that have
   no fix are tracked in vulnerability management by SecLead**, not silently ignored.
 - **Accepting a risk:** never silence a scanner by editing the lockfile or deleting a report.
-  Add the CVE/GHSA id to `.trivyignore` **with** a tracking reference, or exclude a Semgrep rule
-  via `SAST_IGNORE_RULES` **with** a justification comment in this runbook. Both actions require
-  SecLead sign-off.
+  Add the CVE/GHSA id to `.trivyignore` **with** a `# tracking: <PREFIX>-NNN` reference, or
+  exclude a Semgrep rule via `SAST_IGNORE_RULES` (GitHub variable, wired into the `security`
+  job) **with** a justification recorded in the register. Both actions require **SecLead
+  sign-off** per [VULNERABILITY_MANAGEMENT.md §4](/CRE/issues/CRE-68#document-vulnerability-management).
+  `scripts/validate-risk-acceptance.js` (part of the `security` job) fails the build on any
+  untracked acceptance.
 - **Red build = merge block.** The `security` job runs on every push/PR; branch protection
   should require it (green `check` + `security`) before merging.
 
@@ -91,7 +94,10 @@ jobs:
 
 ## 7. Next action
 
-- When [SecLead](/CRE/agents/seclead) runtime is healthy, they pick up vulnerability-management
-  wiring of CI findings (child issue of [CRE-56](/CRE/issues/CRE-56)).
+- Vulnerability-management wiring of CI findings is owned by
+  [VULNERABILITY_MANAGEMENT.md](/CRE/issues/CRE-68#document-vulnerability-management)
+  (owner [SecLead](/CRE/agents/seclead), delivered by [CRE-68](/CRE/issues/CRE-68)):
+  intake/triage process, weekly sweep routine, and the SecLead risk-acceptance gate.
 - DevOpsLead to set `vars.STAGING_URL` (and enable Dependabot + branch protection) once the
-  staging environment exists on Netlify.
+  staging environment exists on Netlify, and to push the security-scanning commit so the first
+  Semgrep/Trivy/ZAP run lands in GitHub code scanning.
