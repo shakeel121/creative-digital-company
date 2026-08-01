@@ -3,6 +3,18 @@
 Company website and product surface for Creative Digital Company. A fast, accessible
 static site (Vite + vanilla JS) that is the on-ramp for Workstreams B and C.
 
+## Live site
+
+- **Production:** https://creative-digital-company.netlify.app
+- **Hosting:** Netlify (deployed from `dist/` via `netlify deploy`)
+- **Source repo:** https://github.com/shakeel121/creative-digital-company
+
+## CI/CD
+
+- **CI:** GitHub Actions runs lint + test + build on every push/PR to `main`
+  (see `.github/workflows/ci.yml`).
+- **Deploy:** `dist/` is deployed to Netlify manually via `netlify deploy --prod --dir dist`.
+
 ## Prerequisites
 
 - Node.js >= 22 (developed on Node 24)
