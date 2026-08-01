@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Brand Preview</title>
+    <link rel="stylesheet" href="brand.css" />
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family: var(--font-sans);
+        background: var(--color-bg);
+        color: var(--color-text);
+        padding: 2rem;
+      }
+      h1 {
+        font-size: var(--text-2xl);
+        margin: 0 0 0.25rem;
+        letter-spacing: var(--tracking-heading);
+      }
+      h2 {
+        font-size: var(--text-lg);
+        font-weight: var(--weight-semibold);
+        margin: 2rem 0 0.75rem;
+        letter-spacing: var(--tracking-heading);
+      }
+      .row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+      }
+      .swatch {
+        width: 160px;
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-md);
+        overflow: hidden;
+      }
+      .swatch .chip {
+        height: 56px;
+      }
+      .swatch .meta {
+        padding: 0.5rem 0.75rem;
+        font-size: var(--text-xs);
+        color: var(--color-text-muted);
+      }
+      .swatch .meta strong {
+        display: block;
+        color: var(--color-text);
+        font-weight: var(--weight-semibold);
+      }
+      .logo-row {
+        display: flex;
+        align-items: center;
+        gap: 3rem;
+        padding: 1.5rem;
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-md);
+      }
+      .tile-dark {
+        background: var(--ink-950);
+      }
+      .tile-light {
+        background: var(--ink-0);
+      }
+      .type-sample {
+        display: grid;
+        gap: 0.5rem;
+      }
+      .type-sample div {
+        display: flex;
+        align-items: baseline;
+        gap: 1rem;
+      }
+      .type-sample .label {
+        width: 150px;
+        color: var(--color-text-muted);
+        font-size: var(--text-xs);
+        flex-shrink: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Brand Preview</h1>
+    <p style="color: var(--color-text-muted)">Creative Digital Company — M3-1a brand identity</p>
+
+    <h2>Light theme</h2>
+    <div class="row">
+      <div class="swatch"><div class="chip" style="background: var(--ink-0)"></div><div class="meta"><strong>surface</strong>#ffffff</div></div>
+      <div class="swatch"><div class="chip" style="background: var(--ink-50)"></div><div class="meta"><strong>surface-soft</strong>#f4f4f6</div></div>
+      <div class="swatch"><div class="chip" style="background: var(--ink-900)"></div><div class="meta"><strong>text</strong>#14141b</div></div>
+      <div class="swatch"><div class="chip" style="background: var(--accent-500)"></div><div class="meta"><strong>accent</strong>#ff5c38</div></div>
+      <div class="swatch"><div class="chip" style="background: var(--accent-700)"></div><div class="meta"><strong>accent-text</strong>#d23b16</div></div>
+      <div class="swatch"><div class="chip" style="background: var(--success-700)"></div><div class="meta"><strong>success</strong>#1e7d3c</div></div>
+      <div class="swatch"><div class="chip" style="background: var(--warning-700)"></div><div class="meta"><strong>warning</strong>#9a6700</div></div>
+      <div class="swatch"><div class="chip" style="background: var(--danger-700)"></div><div class="meta"><strong>danger</strong>#b91c1c</div></div>
+    </div>
+
+    <h2>Dark theme</h2>
+    <div class="row" style="background: var(--ink-950); padding: 1rem; border-radius: var(--radius-md)">
+      <div class="swatch"><div class="chip" style="background: var(--ink-950)"></div><div class="meta"><strong>bg</strong>#0c0c10</div></div>
+      <div class="swatch"><div class="chip" style="background: var(--ink-900)"></div><div class="meta"><strong>surface</strong>#14141b</div></div>
+      <div class="swatch"><div class="chip" style="background: var(--ink-850)"></div><div class="meta"><strong>raised</strong>#1b1b24</div></div>
+      <div class="swatch"><div class="chip" style="background: var(--ink-50)"></div><div class="meta"><strong>text</strong>#f4f4f6</div></div>
+      <div class="swatch"><div class="chip" style="background: var(--accent-500)"></div><div class="meta"><strong>accent</strong>#ff5c38</div></div>
+      <div class="swatch"><div class="chip" style="background: var(--success-500)"></div><div class="meta"><strong>success</strong>#46c968</div></div>
+      <div class="swatch"><div class="chip" style="background: var(--warning-500)"></div><div class="meta"><strong>warning</strong>#f5a623</div></div>
+      <div class="swatch"><div class="chip" style="background: var(--danger-500)"></div><div class="meta"><strong>danger</strong>#ff6b6b</div></div>
+    </div>
+
+    <h2>Logo — mark on light</h2>
+    <div class="logo-row">
+      <img src="logo-mark.svg" width="96" height="96" alt="mark" />
+      <img src="logo-wordmark.svg" width="240" alt="wordmark" />
+    </div>
+
+    <h2>Logo — inverse on dark</h2>
+    <div class="logo-row tile-dark">
+      <img src="logo-mark-inverse.svg" width="96" height="96" alt="mark inverse" />
+      <img src="logo-wordmark-inverse.svg" width="240" alt="wordmark inverse" />
+    </div>
+
+    <h2>Favicon</h2>
+    <div class="logo-row">
+      <img src="../public/favicon.svg" width="48" height="48" alt="favicon" />
+    </div>
+
+    <h2>Type scale</h2>
+    <div class="type-sample">
+      <div><span class="label">display</span><span style="font-size: var(--text-display); font-weight: var(--weight-extrabold); letter-spacing: var(--tracking-tight); line-height: var(--leading-tight)">We build brands people remember.</span></div>
+      <div><span class="label">h1 · 4xl</span><span style="font-size: var(--text-4xl); font-weight: var(--weight-bold); letter-spacing: var(--tracking-heading)">Company formation, simplified</span></div>
+      <div><span class="label">h2 · 3xl</span><span style="font-size: var(--text-3xl); font-weight: var(--weight-bold)">Services</span></div>
+      <div><span class="label">h3 · 2xl</span><span style="font-size: var(--text-2xl); font-weight: var(--weight-semibold)">Brand identity</span></div>
+      <div><span class="label">body · base</span><span style="font-size: var(--text-base); font-weight: var(--weight-regular); line-height: var(--leading-normal)">Creative Digital Company is a design and development studio.</span></div>
+      <div><span class="label">muted</span><span style="font-size: var(--text-base); color: var(--color-text-muted)">Accessible, fast, and considered interfaces.</span></div>
+      <div><span class="label">kicker</span><span style="font-size: var(--text-xs); font-weight: var(--weight-bold); letter-spacing: var(--tracking-kicker); text-transform: uppercase; color: var(--color-accent)">What we do</span></div>
+    </div>
+  </body>
+</html>

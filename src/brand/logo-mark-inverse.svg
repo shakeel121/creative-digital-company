@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Creative Digital Company mark">
+  <path
+    d="M 51.94 41.30 A 22 22 0 1 1 51.94 22.70"
+    fill="none"
+    stroke="#f4f4f6"
+    stroke-width="11"
+    stroke-linecap="round"
+  />
+  <circle cx="57.5" cy="32" r="3.4" fill="#ff5c38" />
+</svg>

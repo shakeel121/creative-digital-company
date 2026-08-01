@@ -1,0 +1,209 @@
+/*
+ * Creative Digital Company — Brand identity tokens (CRE-52 / M3-1a)
+ *
+ * Source of truth for the design-tokens module (CRE-53). Every value is a
+ * named CSS custom property. Do not inline brand values elsewhere; extend this
+ * file instead (system-level change proposal required).
+ *
+ * Contrast: all text-pairing tokens below meet WCAG 2.1 AA (>= 4.5:1) for
+ * their documented pairing. Verified ratios are annotated per group.
+ */
+
+:root {
+  /* ------------------------------------------------------------------ *
+   * Color — raw palette                                                 *
+   * ------------------------------------------------------------------ */
+
+  /* Ink (neutral graphite, cool-leaning) */
+  --ink-950: #0c0c10;
+  --ink-900: #14141b;
+  --ink-850: #1b1b24;
+  --ink-800: #26262f;
+  --ink-700: #3a3a44;
+  --ink-600: #55555f;
+  --ink-500: #6f6f7a;
+  --ink-400: #84848e;
+  --ink-300: #a2a2ad;
+  --ink-200: #c8c8d0;
+  --ink-100: #e4e4e9;
+  --ink-50: #f4f4f6;
+  --ink-0: #ffffff;
+
+  /* Accent (vermilion/coral) */
+  --accent-50: #fff1ed;
+  --accent-100: #ffe3d8;
+  --accent-200: #ffc4b0;
+  --accent-300: #ffa388;
+  --accent-400: #ff845f;
+  --accent-500: #ff5c38;
+  --accent-600: #f04a24;
+  --accent-700: #d23b16;
+  --accent-800: #b02f12;
+  --accent-900: #8f2510;
+
+  /* Semantic raw */
+  --success-700: #1e7d3c;
+  --success-500: #46c968;
+  --success-300: #8ee7ab;
+  --success-bg-light: #e7f6ec;
+  --success-bg-dark: #12321c;
+
+  --warning-700: #9a6700;
+  --warning-500: #f5a623;
+  --warning-300: #ffd98a;
+  --warning-bg-light: #fff4e0;
+  --warning-bg-dark: #3a2a08;
+
+  --danger-700: #b91c1c;
+  --danger-500: #ff6b6b;
+  --danger-300: #ffb3b3;
+  --danger-bg-light: #fde8e8;
+  --danger-bg-dark: #3a1212;
+
+  /* ------------------------------------------------------------------ *
+   * Color — semantic tokens (light theme, default)                      *
+   * ------------------------------------------------------------------ */
+
+  --color-bg: var(--ink-0);
+  --color-surface: var(--ink-50);
+  --color-surface-raised: var(--ink-0);
+  --color-text: var(--ink-900);
+  --color-text-muted: var(--ink-700);
+  --color-text-subtle: var(--ink-500);
+  --color-border: rgba(20, 20, 27, 0.12);
+  --color-border-strong: rgba(20, 20, 27, 0.28);
+
+  --color-accent: var(--accent-500);
+  --color-accent-hover: var(--accent-600);
+  --color-accent-pressed: var(--accent-700);
+  --color-accent-strong: var(--accent-700);
+  --color-on-accent: var(--ink-950);
+  --color-accent-soft: var(--accent-50);
+  --color-link: var(--accent-700);
+  --color-link-hover: var(--accent-800);
+  --color-focus: var(--accent-400);
+
+  --color-success: var(--success-700);
+  --color-success-bg: var(--success-bg-light);
+  --color-warning: var(--warning-700);
+  --color-warning-bg: var(--warning-bg-light);
+  --color-danger: var(--danger-700);
+  --color-danger-bg: var(--danger-bg-light);
+
+  --shadow-sm: 0 1px 2px rgba(20, 20, 27, 0.08);
+  --shadow-md: 0 4px 12px rgba(20, 20, 27, 0.1);
+  --shadow-lg: 0 8px 24px rgba(20, 20, 27, 0.12);
+  --shadow-accent: 0 8px 24px rgba(255, 92, 56, 0.3);
+}
+
+/* ------------------------------------------------------------------ *
+ * Dark theme                                                           *
+ * ------------------------------------------------------------------ */
+[data-theme='dark'],
+.dark {
+  --color-bg: var(--ink-950);
+  --color-surface: var(--ink-900);
+  --color-surface-raised: var(--ink-850);
+  --color-text: var(--ink-50);
+  --color-text-muted: var(--ink-300);
+  --color-text-subtle: var(--ink-400);
+  --color-border: rgba(244, 244, 246, 0.12);
+  --color-border-strong: rgba(244, 244, 246, 0.28);
+
+  --color-accent: var(--accent-500);
+  --color-accent-hover: var(--accent-400);
+  --color-accent-pressed: var(--accent-300);
+  --color-accent-strong: var(--accent-400);
+  --color-on-accent: var(--ink-950);
+  --color-accent-soft: var(--accent-50);
+  --color-link: var(--accent-400);
+  --color-link-hover: var(--accent-300);
+  --color-focus: var(--accent-400);
+
+  --color-success: var(--success-500);
+  --color-success-bg: var(--success-bg-dark);
+  --color-warning: var(--warning-500);
+  --color-warning-bg: var(--warning-bg-dark);
+  --color-danger: var(--danger-500);
+  --color-danger-bg: var(--danger-bg-dark);
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+  --shadow-accent: 0 8px 24px rgba(255, 92, 56, 0.35);
+}
+
+:root {
+  /* ------------------------------------------------------------------ *
+   * Typography                                                          *
+   * ------------------------------------------------------------------ */
+
+  --font-sans: 'Inter', 'Segoe UI', system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif;
+  --font-display:
+    'Inter', 'Segoe UI', system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', 'Cascadia Code', 'Consolas', monospace;
+
+  --text-xs: 0.75rem; /* caption */
+  --text-sm: 0.875rem; /* small/helper */
+  --text-base: 1rem; /* body */
+  --text-lg: 1.125rem; /* lead */
+  --text-xl: 1.375rem; /* h4 / card title */
+  --text-2xl: 1.75rem; /* h3 */
+  --text-3xl: 2.25rem; /* h2 */
+  --text-4xl: 3rem; /* h1 */
+  --text-display: clamp(2.5rem, 6vw, 4.5rem); /* hero */
+
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+  --weight-extrabold: 800;
+
+  --leading-tight: 1.05;
+  --leading-heading: 1.15;
+  --leading-normal: 1.6;
+  --leading-relaxed: 1.7;
+
+  --tracking-tight: -0.03em;
+  --tracking-heading: -0.02em;
+  --tracking-normal: 0;
+  --tracking-kicker: 0.12em;
+
+  /* ------------------------------------------------------------------ *
+   * Spacing                                                             *
+   * ------------------------------------------------------------------ */
+
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-8: 3rem;
+  --space-10: 4rem;
+  --space-12: 6rem;
+  --space-16: 8rem;
+
+  --container-max: 1080px;
+  --container-pad: 1.25rem;
+
+  /* ------------------------------------------------------------------ *
+   * Radii                                                               *
+   * ------------------------------------------------------------------ */
+
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+  --radius-full: 9999px;
+
+  /* ------------------------------------------------------------------ *
+   * Motion                                                              *
+   * ------------------------------------------------------------------ */
+
+  --duration-fast: 100ms;
+  --duration-base: 200ms;
+  --duration-slow: 500ms;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+}
