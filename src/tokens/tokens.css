@@ -1,0 +1,29 @@
+/*
+ * Creative Digital Company — Design tokens module (CRE-53 / M3-1b)
+ *
+ * Single importable surface for the design tokens the M1 site consumes, and
+ * that the component library (CRE-34) and site rebrand (CRE-35) will consume
+ * next. All token categories are exposed as :root CSS custom properties:
+ *
+ *   - Colors      raw palette + semantic light/dark (--color-*, --ink-*, --accent-*)
+ *   - Typography  family / size / weight / leading / tracking (--font-*, --text-*, ...)
+ *   - Spacing     (--space-*, --container-*)
+ *   - Radii       (--radius-*)
+ *   - Shadows     (--shadow-*)
+ *
+ * Raw brand values are owned by the brand identity deliverable (CRE-52) and
+ * live in `src/brand/brand.css`; this module imports that file as the
+ * canonical source and layers site/app tokens on top. It never duplicates
+ * brand values. Components must reference tokens from this module instead of
+ * inlining brand values.
+ */
+
+@import '../brand/brand.css';
+
+/* ------------------------------------------------------------------ *
+ * Site tokens                                                          *
+ * ------------------------------------------------------------------ */
+:root {
+  /* Layout tokens for the M1 marketing site (site-specific, not brand scale) */
+  --nav-height: 4rem;
+}

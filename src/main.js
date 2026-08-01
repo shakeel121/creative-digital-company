@@ -1,3 +1,4 @@
+import './tokens/tokens.css';
 import './style.css';
 
 const navToggle = document.querySelector('.nav-toggle');

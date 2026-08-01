@@ -1,17 +1,3 @@
-:root {
-  --color-bg: #0c0c10;
-  --color-surface: #14141b;
-  --color-surface-raised: #1b1b24;
-  --color-text: #f4f4f6;
-  --color-text-muted: #a2a2ad;
-  --color-accent: #ff5c38;
-  --color-accent-contrast: #0c0c10;
-  --color-border: rgba(244, 244, 246, 0.12);
-  --radius: 14px;
-  --max-width: 1080px;
-  --font-sans: 'Inter', 'Segoe UI', system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif;
-}
-
 * {
   box-sizing: border-box;
 }
@@ -25,7 +11,7 @@ body {
   background: var(--color-bg);
   color: var(--color-text);
   font-family: var(--font-sans);
-  line-height: 1.6;
+  line-height: var(--leading-normal);
   -webkit-font-smoothing: antialiased;
 }
 
@@ -34,9 +20,9 @@ a {
 }
 
 :focus-visible {
-  outline: 2px solid var(--color-accent);
+  outline: 2px solid var(--color-focus);
   outline-offset: 3px;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
 }
 
 .skip-link {
@@ -44,8 +30,8 @@ a {
   left: -999px;
   top: 0;
   background: var(--color-accent);
-  color: var(--color-accent-contrast);
-  padding: 0.5rem 1rem;
+  color: var(--color-on-accent);
+  padding: var(--space-2) var(--space-4);
   z-index: 100;
 }
 
@@ -57,25 +43,25 @@ a {
   position: sticky;
   top: 0;
   z-index: 50;
-  background: rgba(12, 12, 16, 0.85);
+  background: color-mix(in srgb, var(--color-bg) 85%, transparent);
   backdrop-filter: blur(8px);
   border-bottom: 1px solid var(--color-border);
 }
 
 .nav {
-  max-width: var(--max-width);
+  max-width: var(--container-max);
   margin: 0 auto;
-  padding: 0 1.25rem;
-  height: 4rem;
+  padding: 0 var(--container-pad);
+  height: var(--nav-height);
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
 .brand {
-  font-weight: 800;
-  font-size: 1.35rem;
-  letter-spacing: -0.02em;
+  font-weight: var(--weight-extrabold);
+  font-size: var(--text-xl);
+  letter-spacing: var(--tracking-heading);
   text-decoration: none;
 }
 
@@ -85,7 +71,7 @@ a {
 
 .nav-list {
   display: flex;
-  gap: 1.75rem;
+  gap: var(--space-6);
   list-style: none;
   margin: 0;
   padding: 0;
@@ -94,8 +80,8 @@ a {
 .nav-list a {
   text-decoration: none;
   color: var(--color-text-muted);
-  font-size: 0.95rem;
-  transition: color 0.15s ease;
+  font-size: var(--text-sm);
+  transition: color var(--duration-fast) var(--ease-out);
 }
 
 .nav-list a:hover {
@@ -107,7 +93,7 @@ a {
   background: none;
   border: 0;
   cursor: pointer;
-  padding: 0.5rem;
+  padding: var(--space-2);
 }
 
 .nav-toggle-bar {
@@ -115,81 +101,81 @@ a {
   width: 22px;
   height: 2px;
   background: var(--color-text);
-  margin: 4px 0;
-  transition: transform 0.2s ease;
+  margin: var(--space-1) 0;
+  transition: transform var(--duration-base) var(--ease-out);
 }
 
 main {
-  max-width: var(--max-width);
+  max-width: var(--container-max);
   margin: 0 auto;
-  padding: 0 1.25rem;
+  padding: 0 var(--container-pad);
 }
 
 .hero {
-  padding: 6rem 0 4rem;
+  padding: var(--space-12) 0 var(--space-10);
 }
 
 .hero h1 {
-  font-size: clamp(2.4rem, 6vw, 4.25rem);
-  line-height: 1.05;
-  letter-spacing: -0.03em;
+  font-size: var(--text-display);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-tight);
   max-width: 18ch;
-  margin: 0 0 1.25rem;
+  margin: 0 0 var(--container-pad);
 }
 
 .hero-lede {
   color: var(--color-text-muted);
-  font-size: 1.15rem;
+  font-size: var(--text-lg);
   max-width: 52ch;
-  margin: 0 0 2rem;
+  margin: 0 0 var(--space-6);
 }
 
 .btn {
   display: inline-block;
-  padding: 0.8rem 1.5rem;
-  border-radius: 999px;
+  padding: var(--space-3) var(--space-5);
+  border-radius: var(--radius-full);
   text-decoration: none;
-  font-weight: 600;
+  font-weight: var(--weight-semibold);
   transition:
-    transform 0.15s ease,
-    box-shadow 0.15s ease;
+    transform var(--duration-base) var(--ease-out),
+    box-shadow var(--duration-base) var(--ease-out);
 }
 
 .btn-primary {
   background: var(--color-accent);
-  color: var(--color-accent-contrast);
+  color: var(--color-on-accent);
 }
 
 .btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(255, 92, 56, 0.35);
+  box-shadow: var(--shadow-accent);
 }
 
 .section {
-  padding: 4rem 0;
+  padding: var(--space-10) 0;
   border-top: 1px solid var(--color-border);
   scroll-margin-top: 5rem;
 }
 
 .kicker {
   color: var(--color-accent);
-  font-weight: 700;
+  font-weight: var(--weight-bold);
   text-transform: uppercase;
-  letter-spacing: 0.12em;
-  font-size: 0.8rem;
-  margin: 0 0 0.5rem;
+  letter-spacing: var(--tracking-kicker);
+  font-size: var(--text-xs);
+  margin: 0 0 var(--space-2);
 }
 
 .section h2 {
-  font-size: clamp(1.8rem, 4vw, 2.6rem);
-  letter-spacing: -0.02em;
-  margin: 0 0 2rem;
+  font-size: var(--text-3xl);
+  letter-spacing: var(--tracking-heading);
+  margin: 0 0 var(--space-6);
 }
 
 .card-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-  gap: 1.25rem;
+  gap: var(--space-5);
   list-style: none;
   margin: 0;
   padding: 0;
@@ -198,14 +184,14 @@ main {
 .card {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-  padding: 1.5rem;
+  border-radius: var(--radius-md);
+  padding: var(--space-5);
   opacity: 0;
-  transform: translateY(12px);
+  transform: translateY(var(--space-3));
   transition:
-    opacity 0.5s ease,
-    transform 0.5s ease,
-    background 0.2s ease;
+    opacity var(--duration-slow) var(--ease-out),
+    transform var(--duration-slow) var(--ease-out),
+    background var(--duration-base) var(--ease-out);
 }
 
 .card.is-visible {
@@ -218,21 +204,21 @@ main {
 }
 
 .card h3 {
-  margin: 0 0 0.5rem;
-  font-size: 1.1rem;
+  margin: 0 0 var(--space-2);
+  font-size: var(--text-xl);
 }
 
 .card p {
   margin: 0;
   color: var(--color-text-muted);
-  font-size: 0.95rem;
+  font-size: var(--text-base);
 }
 
 .email-link {
   color: var(--color-accent);
-  font-weight: 600;
+  font-weight: var(--weight-semibold);
   text-decoration: none;
-  border-bottom: 1px solid rgba(255, 92, 56, 0.4);
+  border-bottom: 1px solid color-mix(in srgb, var(--color-accent) 40%, transparent);
 }
 
 .email-link:hover {
@@ -241,11 +227,11 @@ main {
 
 .site-footer {
   border-top: 1px solid var(--color-border);
-  margin-top: 2rem;
-  padding: 2rem 1.25rem;
+  margin-top: var(--space-6);
+  padding: var(--space-6) var(--container-pad);
   text-align: center;
   color: var(--color-text-muted);
-  font-size: 0.9rem;
+  font-size: var(--text-sm);
 }
 
 @media (max-width: 640px) {
@@ -255,7 +241,7 @@ main {
 
   .nav-list {
     position: absolute;
-    top: 4rem;
+    top: var(--nav-height);
     left: 0;
     right: 0;
     flex-direction: column;
@@ -270,7 +256,7 @@ main {
   }
 
   .nav-list a {
-    padding: 0.9rem 1.25rem;
+    padding: var(--space-4) var(--container-pad);
     border-top: 1px solid var(--color-border);
   }
 }

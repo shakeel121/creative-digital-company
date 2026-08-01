@@ -13,7 +13,7 @@ const getInPageLinks = (source) => [...source.matchAll(/href="#([^"]+)"/g)].map(
 describe('index.html', () => {
   it('is a valid HTML document with lang and viewport', () => {
     expect(html).toMatch(/<!doctype html>/i);
-    expect(html).toMatch(/<html lang="en">/);
+    expect(html).toMatch(/<html lang="en"[^>]*>/);
     expect(html).toContain('name="viewport"');
   });
 
