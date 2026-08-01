@@ -1,0 +1,101 @@
+/*
+ * Creative Digital Company — Form component (.cdc-field)
+ *
+ * Spec: M3-2.1 component-spec (CRE-38) §6.3.
+ * Elements: .cdc-field (single-column wrapper), .cdc-label, .cdc-input /
+ * .cdc-textarea / .cdc-select, .cdc-help, .cdc-error. Validation behavior
+ * lives in src/components/form.js (blur + submit; aria-invalid mirroring).
+ * Token contract (CRE-33): every value via var(...) — no hardcoded values.
+ */
+
+.cdc-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.cdc-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.cdc-label {
+  color: var(--color-text);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+}
+
+.cdc-label__asterisk {
+  color: var(--color-accent);
+}
+
+.cdc-input,
+.cdc-textarea,
+.cdc-select {
+  width: 100%;
+  box-sizing: border-box;
+  padding: var(--space-3);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-family: inherit;
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+}
+
+.cdc-input,
+.cdc-select {
+  min-height: 2.75rem; /* 44px product baseline */
+}
+
+.cdc-input::placeholder,
+.cdc-textarea::placeholder {
+  color: var(--color-text-subtle);
+}
+
+.cdc-input:focus,
+.cdc-textarea:focus,
+.cdc-select:focus {
+  border-color: var(--color-focus);
+}
+
+.cdc-input:disabled,
+.cdc-textarea:disabled,
+.cdc-select:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.cdc-help {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+.cdc-error {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-1);
+  margin: 0;
+  color: var(--color-danger);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+}
+
+.cdc-error[hidden] {
+  display: none;
+}
+
+.cdc-error__icon {
+  flex-shrink: 0;
+  width: 1rem;
+  height: 1rem;
+}
+
+.cdc-field--invalid .cdc-input,
+.cdc-field--invalid .cdc-textarea,
+.cdc-field--invalid .cdc-select {
+  border-color: var(--color-danger);
+}

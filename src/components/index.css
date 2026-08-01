@@ -1,0 +1,24 @@
+/*
+ * Creative Digital Company — Component library aggregator (M3-2 / CRE-39)
+ *
+ * Import this single file from the app entry (src/main.js) to load all five
+ * component stylesheets. Design tokens come from the M3-1 module
+ * (src/tokens/tokens.css, imported at the app entry); components reference
+ * tokens via var(...) and never hardcode brand values.
+ */
+
+@import './button.css';
+@import './card.css';
+@import './form.css';
+@import './nav.css';
+@import './footer.css';
+
+@media (prefers-reduced-motion: reduce) {
+  .cdc-button,
+  .cdc-card,
+  .cdc-nav__list,
+  .cdc-nav__toggle-bar {
+    transition: none;
+    transform: none;
+  }
+}

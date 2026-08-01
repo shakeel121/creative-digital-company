@@ -1,0 +1,135 @@
+/*
+ * Creative Digital Company — Nav component (.cdc-nav) + mobile toggle
+ *
+ * Spec: M3-2.1 component-spec (CRE-38) §6.4.
+ * Landmark: one <nav aria-label="Primary">; a second nav (footer) must carry a
+ * distinct aria-label. Toggle is a real <button> with aria-expanded +
+ * aria-controls. Progressive enhancement: without JS the list renders open as a
+ * stacked panel and the toggle stays hidden; JS (src/components/nav.js) adds
+ * the .cdc-js hook on <html> which hides the list until opened.
+ * Token contract (CRE-33): every value via var(...) — no hardcoded values.
+ */
+
+.cdc-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: color-mix(in srgb, var(--color-bg) 85%, transparent);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.cdc-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-5);
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: 0 var(--container-pad);
+  min-height: var(--nav-height);
+}
+
+.cdc-nav__brand {
+  display: inline-flex;
+  align-items: center;
+  color: var(--color-text);
+  font-size: var(--text-xl);
+  font-weight: var(--weight-extrabold);
+  letter-spacing: var(--tracking-heading);
+  line-height: var(--leading-heading);
+  text-decoration: none;
+}
+
+.cdc-nav__brand-dot {
+  color: var(--color-accent);
+}
+
+.cdc-nav__list {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.cdc-nav__link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem; /* 44px product baseline tap target */
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  text-decoration: none;
+  transition: color var(--duration-fast) var(--ease-out);
+}
+
+.cdc-nav__link:hover {
+  color: var(--color-text);
+}
+
+.cdc-nav__toggle {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: var(--space-2);
+  background: none;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.cdc-nav__toggle-bar {
+  display: block;
+  width: 1.375rem;
+  height: 0.125rem;
+  background: var(--color-text);
+  transition: transform var(--duration-base) var(--ease-out);
+}
+
+.cdc-nav__toggle-bar + .cdc-nav__toggle-bar {
+  margin-top: var(--space-1);
+}
+
+@media (max-width: 640px) {
+  .cdc-nav__list {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-1);
+    padding: var(--space-3) var(--container-pad);
+    background: var(--color-bg);
+    border-bottom: 1px solid var(--color-border);
+    box-shadow: var(--shadow-md);
+  }
+
+  /* Without JS the toggle stays hidden and the full link list remains visible */
+  .cdc-nav__toggle {
+    display: none;
+  }
+
+  /* JS-enabled: toggle shown, list collapsed until opened */
+  .cdc-js .cdc-nav__toggle {
+    display: inline-flex;
+  }
+
+  .cdc-js .cdc-nav__list {
+    display: none;
+  }
+
+  .cdc-js .cdc-nav__list.is-open {
+    display: flex;
+  }
+
+  .cdc-nav__link {
+    padding: var(--space-3) var(--space-3);
+  }
+}

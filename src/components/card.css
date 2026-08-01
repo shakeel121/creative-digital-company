@@ -1,0 +1,90 @@
+/*
+ * Creative Digital Company — Card component (.cdc-card)
+ *
+ * Spec: M3-2.1 component-spec (CRE-38) §6.2.
+ * Structure: __kicker, __title, __body, __footer. Modifiers: --interactive
+ * (whole-card hit area via the link's ::after, never a click handler on the
+ * card), --featured (accent top border), default flat.
+ * Token contract (CRE-33): every value via var(...) — no hardcoded values.
+ */
+
+.cdc-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-5);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  transition:
+    background-color var(--duration-base) var(--ease-out),
+    box-shadow var(--duration-base) var(--ease-out),
+    transform var(--duration-base) var(--ease-out);
+}
+
+.cdc-card--interactive:hover {
+  background: var(--color-surface-raised);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-0.125rem);
+}
+
+.cdc-card--interactive:focus-within {
+  box-shadow: 0 0 0 2px var(--color-focus);
+}
+
+.cdc-card--featured {
+  border-top: 3px solid var(--color-accent);
+}
+
+.cdc-card__kicker {
+  margin: 0;
+  color: var(--color-accent);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-bold);
+  letter-spacing: var(--tracking-kicker);
+  text-transform: uppercase;
+}
+
+.cdc-card__title {
+  margin: 0;
+  font-size: var(--text-xl);
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-heading);
+  line-height: var(--leading-heading);
+}
+
+.cdc-card__body {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--text-base);
+}
+
+.cdc-card__footer {
+  margin-top: var(--space-2);
+}
+
+.cdc-card--interactive .cdc-card__link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.cdc-card--interactive .cdc-card__link:hover {
+  color: var(--color-accent);
+}
+
+.cdc-card--interactive .cdc-card__link::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+
+.cdc-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: var(--space-5);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}

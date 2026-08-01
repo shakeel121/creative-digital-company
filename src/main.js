@@ -1,5 +1,8 @@
 import './tokens/tokens.css';
 import './style.css';
+import './components/index.css';
+import './components/nav.js';
+import './components/form.js';
 
 const navToggle = document.querySelector('.nav-toggle');
 const navMenu = document.querySelector('.nav-list');
