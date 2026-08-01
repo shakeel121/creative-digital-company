@@ -19,3 +19,8 @@ Thumbs.db
 .idea/
 .vscode/
 *.swp
+
+# Environment files (never commit real secrets)
+.env
+.env.*
+!.env.example

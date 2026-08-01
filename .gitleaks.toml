@@ -1,0 +1,20 @@
+title = "Creative Digital Company gitleaks config"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Exclusions for known-safe files and placeholder/example values"
+paths = [
+  '''(.*)?node_modules.*''',
+  '''(.*)?dist/.*''',
+  '''(.*)?package-lock\.json$''',
+  '''(.*)?\.gitleaks\.toml$''',
+  '''(.*)?\.git/.*''',
+  '''(.*)?test/fixtures/.*''',
+]
+regexes = [
+  '''(?i)(changeme|placeholder|your[-_]?(api[-_]?key|secret|token)|your_secret|your-token|REDACTED|XXXXX+)''',
+  '''hello@creative-digital\.example''',
+  '''Bearer <token>''',
+]

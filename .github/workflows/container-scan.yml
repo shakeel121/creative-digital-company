@@ -1,0 +1,58 @@
+name: Container scan (reusable)
+
+on:
+  workflow_call:
+    inputs:
+      image:
+        required: true
+        type: string
+        description: Image reference to scan, e.g. ghcr.io/org/app:sha
+      severity:
+        required: false
+        type: string
+        default: CRITICAL,HIGH
+      fail-on-findings:
+        required: false
+        type: boolean
+        default: true
+    secrets:
+      registry-username:
+        required: false
+      registry-password:
+        required: false
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  scan:
+    name: Scan image ${{ inputs.image }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Authenticate to container registry
+        uses: docker/login-action@v3
+        if: inputs.registry-username != ''
+        with:
+          registry: ghcr.io
+          username: ${{ secrets.registry-username }}
+          password: ${{ secrets.registry-password }}
+
+      - name: Trivy image scan
+        uses: aquasecurity/trivy-action@0.30.0
+        with:
+          scan-type: image
+          image-ref: ${{ inputs.image }}
+          severity: ${{ inputs.severity }}
+          exit-code: ${{ inputs.fail-on-findings && '1' || '0' }}
+          format: sarif
+          output: trivy-image.sarif
+          ignore-unfixed: true
+
+      - name: Upload Trivy image SARIF
+        if: ${{ always() && hashFiles('trivy-image.sarif') != '' }}
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: trivy-image.sarif

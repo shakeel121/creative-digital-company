@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# Pre-commit secret scan. Enable with:
+#   git config core.hooksPath .githooks
+# Falls back to CI enforcement (Gitleaks step in ci.yml) when not installed locally.
+set -euo pipefail
+
+if ! command -v gitleaks >/dev/null 2>&1; then
+  echo "gitleaks not installed locally — skipping pre-commit scan (CI will enforce)."
+  echo "Install from https://github.com/gitleaks/gitleaks/releases to enable."
+  exit 0
+fi
+
+gitleaks protect --staged --verbose --config .gitleaks.toml

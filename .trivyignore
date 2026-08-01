@@ -1,0 +1,6 @@
+# Trivy ignore file.
+# Entries here are accepted, documented risks that were reviewed by the owning
+# team. Every entry MUST reference the tracking issue/justification in
+# docs/CICD_SECURITY_SCANNING.md. Format: one CVE/GHSA id per line.
+# Example:
+# CVE-2099-99999  # dev-only transitive dep, no prod exposure, tracked in vuln-mgmt

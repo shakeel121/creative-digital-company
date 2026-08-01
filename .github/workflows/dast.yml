@@ -1,0 +1,57 @@
+name: DAST
+
+on:
+  schedule:
+    # Monday 03:00 UTC — runs against staging.
+    - cron: '0 3 * * 1'
+  workflow_dispatch:
+    inputs:
+      target_url:
+        description: 'Base URL to scan (defaults to staging variable)'
+        required: false
+        type: string
+      fail_action:
+        description: 'Fail the job when ZAP reports alerts'
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  dast:
+    name: ZAP full scan + security headers
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Resolve target URL
+        id: target
+        shell: bash
+        run: |
+          URL="${INPUT_TARGET_URL:-${STAGING_URL:-https://staging.creative-digital.example}}"
+          echo "url=${URL}" >> "${GITHUB_OUTPUT}"
+        env:
+          INPUT_TARGET_URL: ${{ github.event.inputs.target_url }}
+          STAGING_URL: ${{ vars.STAGING_URL }}
+
+      - name: ZAP full scan
+        uses: zaproxy/action-full-scan@v0
+        with:
+          target: ${{ steps.target.outputs.url }}
+          fail_action: ${{ github.event.inputs.fail_action == 'true' }}
+          allow_404_warnings: true
+          artifact_name: zap-report
+          sarif_file: zap-results.sarif
+
+      - name: Upload ZAP SARIF
+        if: ${{ always() && hashFiles('zap-results.sarif') != '' }}
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: zap-results.sarif
+
+      - name: Verify security headers
+        shell: bash
+        run: node scripts/security-headers.js --url ${{ steps.target.outputs.url }}

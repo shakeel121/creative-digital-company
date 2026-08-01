@@ -13,6 +13,17 @@ static site (Vite + vanilla JS) that is the on-ramp for Workstreams B and C.
 
 - **CI:** GitHub Actions runs lint + test + build on every push/PR to `main`
   (see `.github/workflows/ci.yml`).
+- **Security scans (CI):** SAST (Semgrep), dependency scan (Trivy) and secret scan
+  (Gitleaks) run in the `security` job on every push/PR and **fail the build on
+  critical/high findings**. SARIF reports are uploaded to GitHub code scanning. See
+  `docs/CICD_SECURITY_SCANNING.md` for the runbook.
+- **DAST:** a scheduled ZAP scan (Monday 03:00 UTC) runs against staging plus a live
+  security-header check (`.github/workflows/dast.yml`).
+- **Dependency updates:** Dependabot opens weekly PRs for npm + GitHub Actions
+  (`.github/dependabot.yml`).
+- **Pre-commit secret scan:** enable locally with
+  `git config core.hooksPath .githooks` (and `chmod +x .githooks/pre-commit` on
+  Linux/macOS). Scans staged changes with Gitleaks; CI enforces regardless.
 - **Deploy:** pushes to `main` are automatically built and deployed to Netlify
   by GitHub Actions (see `.github/workflows/deploy.yml`, `netlify.toml`).
 - **Manual deploy** (fallback):
@@ -74,7 +85,8 @@ Run just the smoke tests with `npm run smoke`.
 
 1. `npm run verify` passes.
 2. `npm run format:check` passes (or run `npm run format`).
-3. No secrets or credentials in the diff.
+3. No secrets or credentials in the diff (Gitleaks gates this in CI).
+4. No new critical/high SAST/dependency findings (the `security` CI job enforces this).
 
 ## Structure
 
