@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Usage examples for the Creative Digital Company component library — buttons, cards, forms, nav, and footer consuming design tokens."
+    />
+    <meta name="theme-color" content="#0c0c10" />
+    <title>Component library examples — Creative Digital Company</title>
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <style>
+      .demo-main {
+        max-width: var(--container-max);
+        margin: 0 auto;
+        padding: 0 var(--container-pad);
+      }
+
+      .demo-section {
+        padding: var(--space-10) 0;
+        border-top: 1px solid var(--color-border);
+      }
+
+      .demo-section h2 {
+        margin: 0 0 var(--space-6);
+        font-size: var(--text-3xl);
+        letter-spacing: var(--tracking-heading);
+      }
+
+      .demo-row {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: var(--space-3);
+        margin-bottom: var(--space-4);
+      }
+
+      .demo-note {
+        margin: 0 0 var(--space-4);
+        color: var(--color-text-muted);
+        font-size: var(--text-sm);
+      }
+    </style>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <header class="cdc-header">
+      <nav class="cdc-nav" aria-label="Primary">
+        <a class="cdc-nav__brand" href="#top">CDC<span class="cdc-nav__brand-dot">.</span></a>
+        <button
+          class="cdc-nav__toggle"
+          type="button"
+          aria-expanded="false"
+          aria-controls="cdc-nav-menu"
+          aria-label="Toggle menu"
+          data-cdc-nav-toggle
+        >
+          <span class="cdc-nav__toggle-bar" aria-hidden="true"></span>
+          <span class="cdc-nav__toggle-bar" aria-hidden="true"></span>
+        </button>
+        <ul class="cdc-nav__list" id="cdc-nav-menu" data-cdc-nav-menu>
+          <li class="cdc-nav__item"><a class="cdc-nav__link" href="#buttons">Buttons</a></li>
+          <li class="cdc-nav__item"><a class="cdc-nav__link" href="#cards">Cards</a></li>
+          <li class="cdc-nav__item"><a class="cdc-nav__link" href="#form">Form</a></li>
+          <li class="cdc-nav__item"><a class="cdc-nav__link" href="#contact">Contact</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main id="main" class="demo-main">
+      <section id="top" class="demo-section">
+        <h1>Component library examples</h1>
+        <p class="demo-note">
+          Every example below consumes design tokens from the M3-1 module — no hardcoded brand
+          values — and satisfies the M3-2.1 accessibility baseline (WCAG 2.1 AA).
+        </p>
+      </section>
+
+      <section id="buttons" class="demo-section">
+        <h2>Buttons</h2>
+        <div class="demo-row">
+          <a class="cdc-button cdc-button--primary" href="#form">Start a project</a>
+          <button class="cdc-button cdc-button--secondary" type="button">Learn more</button>
+          <a class="cdc-button cdc-button--ghost" href="#cards">View our work</a>
+        </div>
+        <p class="demo-note">
+          Sizes, disabled state, and an icon-only button with a programmatic label (never the SVG
+          alone).
+        </p>
+        <div class="demo-row">
+          <button class="cdc-button cdc-button--primary cdc-button--sm" type="button">Small</button>
+          <button class="cdc-button cdc-button--primary" type="button">Default</button>
+          <button class="cdc-button cdc-button--primary cdc-button--lg" type="button">Large</button>
+          <button class="cdc-button cdc-button--primary" type="button" disabled>Disabled</button>
+          <button
+            class="cdc-button cdc-button--secondary cdc-button--icon"
+            type="button"
+            aria-label="Search"
+          >
+            <svg aria-hidden="true" viewBox="0 0 16 16" width="16" height="16" fill="currentColor">
+              <path
+                d="M11.7 10.6a5.5 5.5 0 1 0-1.1 1.1l3.3 3.3 1.1-1.1-3.3-3.3ZM2.5 7a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0Z"
+              />
+            </svg>
+          </button>
+        </div>
+      </section>
+
+      <section id="cards" class="demo-section">
+        <h2>Cards</h2>
+        <p class="demo-note">
+          Non-interactive cards are pure list items; the interactive card is a real link stretched
+          over the whole surface via CSS (no click handler on the card).
+        </p>
+        <ul class="cdc-card-grid">
+          <li class="cdc-card">
+            <h3 class="cdc-card__title">Brand identity</h3>
+            <p class="cdc-card__body">
+              Naming, visual systems, and guidelines that give your company a clear, consistent
+              voice.
+            </p>
+          </li>
+          <li class="cdc-card">
+            <h3 class="cdc-card__title">Web design</h3>
+            <p class="cdc-card__body">
+              Accessible, fast, and considered interfaces — designed around how people actually use
+              them.
+            </p>
+          </li>
+          <li class="cdc-card cdc-card--featured">
+            <p class="cdc-card__kicker">Featured</p>
+            <h3 class="cdc-card__title">Design system</h3>
+            <p class="cdc-card__body">
+              The single emphasized card uses an accent top border so it stands out from its
+              neighbours.
+            </p>
+          </li>
+        </ul>
+        <div class="cdc-card-grid">
+          <article class="cdc-card cdc-card--interactive">
+            <h3 class="cdc-card__title">
+              <a class="cdc-card__link" href="#form">Company website</a>
+            </h3>
+            <p class="cdc-card__body">
+              An interactive card: the entire surface is a hit area, but the only focusable target
+              is the real link inside.
+            </p>
+          </article>
+          <article class="cdc-card cdc-card--interactive">
+            <h3 class="cdc-card__title">
+              <a class="cdc-card__link" href="#buttons">Commerce build</a>
+            </h3>
+            <p class="cdc-card__body">
+              Focus the card with the keyboard and a focus-within ring appears on the whole card.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <section id="form" class="demo-section">
+        <h2>Form</h2>
+        <p class="demo-note">
+          Labeled controls with help and error text bound via aria-describedby; errors show icon +
+          text (never color alone) and aria-invalid mirrors state. Submit with empty fields to see
+          validation.
+        </p>
+        <form class="cdc-form" data-cdc-form novalidate>
+          <div class="cdc-field">
+            <label class="cdc-label" for="demo-name"
+              >Full name <span class="cdc-label__asterisk" aria-hidden="true">*</span></label
+            >
+            <input
+              class="cdc-input"
+              id="demo-name"
+              name="name"
+              type="text"
+              autocomplete="name"
+              required
+              aria-describedby="demo-name-help demo-name-error"
+              aria-invalid="false"
+            />
+            <p class="cdc-help" id="demo-name-help">As shown on your government ID.</p>
+            <p class="cdc-error" id="demo-name-error" role="alert" hidden>
+              <svg
+                class="cdc-error__icon"
+                aria-hidden="true"
+                viewBox="0 0 16 16"
+                width="16"
+                height="16"
+                fill="currentColor"
+              >
+                <path d="M8 1.5 15 14H1L8 1.5Z" />
+              </svg>
+              <span data-cdc-error-text>Enter your full name.</span>
+            </p>
+          </div>
+
+          <div
+            class="cdc-field"
+            data-cdc-error-email="Enter a valid email address, e.g. name@example.com."
+          >
+            <label class="cdc-label" for="demo-email"
+              >Work email <span class="cdc-label__asterisk" aria-hidden="true">*</span></label
+            >
+            <input
+              class="cdc-input"
+              id="demo-email"
+              name="email"
+              type="email"
+              autocomplete="email"
+              required
+              aria-describedby="demo-email-error"
+              aria-invalid="false"
+            />
+            <p class="cdc-error" id="demo-email-error" role="alert" hidden>
+              <svg
+                class="cdc-error__icon"
+                aria-hidden="true"
+                viewBox="0 0 16 16"
+                width="16"
+                height="16"
+                fill="currentColor"
+              >
+                <path d="M8 1.5 15 14H1L8 1.5Z" />
+              </svg>
+              <span data-cdc-error-text>Enter your work email address.</span>
+            </p>
+          </div>
+
+          <div class="cdc-field">
+            <label class="cdc-label" for="demo-budget">Budget range</label>
+            <select class="cdc-select" id="demo-budget" name="budget">
+              <option value="">Choose a range…</option>
+              <option value="5k">Under $5k</option>
+              <option value="10k">$5k–$10k</option>
+              <option value="25k">$10k–$25k</option>
+            </select>
+          </div>
+
+          <div class="cdc-field">
+            <label class="cdc-label" for="demo-message">Project details</label>
+            <textarea
+              class="cdc-textarea"
+              id="demo-message"
+              name="message"
+              rows="4"
+              placeholder="Tell us about your project…"
+            ></textarea>
+            <p class="cdc-help" id="demo-message-help">Optional, but it helps us reply faster.</p>
+          </div>
+
+          <div class="demo-row">
+            <button class="cdc-button cdc-button--primary" type="submit">Send message</button>
+          </div>
+        </form>
+      </section>
+
+      <section id="contact" class="demo-section">
+        <h2>Contact</h2>
+        <p>
+          Write to us at
+          <a class="email-link" href="mailto:hello@creative-digital.example"
+            >hello@creative-digital.example</a
+          >.
+        </p>
+      </section>
+    </main>
+
+    <footer class="cdc-footer">
+      <div class="cdc-footer__inner">
+        <p class="cdc-footer__legal">
+          &copy; <span id="year">2026</span> Creative Digital Company. All rights reserved.
+        </p>
+        <nav class="cdc-footer__nav" aria-label="Footer">
+          <a href="#top">Back to top</a>
+          <a href="#form">Start a project</a>
+        </nav>
+      </div>
+    </footer>
+
+    <script type="module" src="./src/components/examples.js"></script>
+  </body>
+</html>
