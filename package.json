@@ -1,0 +1,30 @@
+{
+  "name": "creative-digital-company-site",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Company website for Creative Digital Company — Workstream A milestone (A3).",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "vitest run",
+    "smoke": "vitest run test/smoke.test.js",
+    "check": "npm run lint && npm run test && npm run build",
+    "verify": "npm run check"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.8.0",
+    "globals": "^17.8.0",
+    "prettier": "^3.9.6",
+    "vite": "^8.2.0",
+    "vitest": "^4.1.10"
+  }
+}
