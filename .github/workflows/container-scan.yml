@@ -41,7 +41,7 @@ jobs:
           password: ${{ secrets.registry-password }}
 
       - name: Trivy image scan
-        uses: aquasecurity/trivy-action@0.30.0
+        uses: aquasecurity/trivy-action@v0.30.0
         with:
           scan-type: image
           image-ref: ${{ inputs.image }}

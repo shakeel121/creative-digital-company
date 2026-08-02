@@ -38,7 +38,7 @@ jobs:
           STAGING_URL: ${{ vars.STAGING_URL }}
 
       - name: ZAP full scan
-        uses: zaproxy/action-full-scan@v0
+        uses: zaproxy/action-full-scan@v0.13.0
         with:
           target: ${{ steps.target.outputs.url }}
           fail_action: ${{ github.event.inputs.fail_action == 'true' }}
