@@ -22,6 +22,7 @@
 | Secret scan (local)    | Gitleaks via `.githooks/pre-commit`    | pre-commit (`git config core.hooksPath .githooks`) | staged secrets              | All devs             |
 | Dependency updates     | Dependabot (npm + GitHub Actions)      | weekly (Mon 06:00 UTC)                             | n/a (opens PRs)             | DevOpsLead           |
 | Security headers       | `scripts/security-headers.js` + vitest | every push/PR + DAST schedule                      | missing/mismatched baseline | DevOpsLead           |
+| SBOM (supply chain)    | CycloneDX (`@cyclonedx/cyclonedx-npm`) | every build (`ci.yml` → `check` job)               | n/a (artifact `dist/bom.json`) | DevOpsLead          |
 | DAST (dynamic)         | OWASP ZAP full scan                    | scheduled Mon 03:00 UTC + manual dispatch          | reports alerts (SARIF)      | DevOpsLead → SecLead |
 
 Findings from all SARIF-producing tools are uploaded to GitHub code scanning
@@ -52,7 +53,16 @@ Findings from all SARIF-producing tools are uploaded to GitHub code scanning
 3. Fix in the owning team's ticket if a fix exists; otherwise draft an acceptance rationale.
 4. Re-run CI; the finding must clear before merge. DAST/ZAP alerts are triaged weekly by SecLead.
 
-## 4. Activating container scanning (M5+)
+## 4. SBOM artifact (supply-chain transparency)
+
+- **Generated:** `npm run sbom` (CycloneDX via `@cyclonedx/cyclonedx-npm`) in the `check` job,
+  after `npm run build`. Writes CycloneDX JSON to `dist/bom.json` from the lockfile.
+- **Published:** `dist/bom.json` ships inside the `site-dist` upload-artifact for every
+  build, so each release is accompanied by an auditable inventory of its dependencies.
+- **Consumption:** attach the SBOM to any release; Dependabot PRs and Trivy scans keep the
+  inventory current. SBOM is not committed to the repo (generated per build).
+
+## 5. Activating container scanning (M5+)
 
 This repo is static-only today; containers arrive with the first backend service. When the first
 image is built, call the reusable workflow from the image build/CD job:
@@ -69,7 +79,7 @@ jobs:
       registry-password: ${{ secrets.GITHUB_TOKEN }}
 ```
 
-## 5. DAST schedule and runbook
+## 6. DAST schedule and runbook
 
 - **Schedule:** `0 3 * * 1` (Monday 03:00 UTC) + `workflow_dispatch` with a custom
   `target_url`. Target = `vars.STAGING_URL` (set the GitHub variable when staging exists),
@@ -81,7 +91,7 @@ jobs:
 - **Header baseline:** `public/_headers` (Netlify). Any change to it must keep the vitest
   baseline green (`test/security.test.js`).
 
-## 6. Rollback path
+## 7. Rollback path
 
 - **Scanner config / workflow broke CI:** revert the workflow/config commit (single logical
   commit per change) and re-merge — same as any CI fix. Old scan configs are reproducible from
@@ -92,7 +102,7 @@ jobs:
   deployments are immutable Netlify releases so a redeploy to a previous known-good release is
   the rollback.
 
-## 7. Next action
+## 8. Next action
 
 - Vulnerability-management wiring of CI findings is owned by
   [VULNERABILITY_MANAGEMENT.md](/CRE/issues/CRE-68#document-vulnerability-management)

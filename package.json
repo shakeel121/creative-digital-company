@@ -16,13 +16,16 @@
     "format:check": "prettier --check .",
     "test": "vitest run",
     "smoke": "vitest run test/smoke.test.js",
+    "sbom": "cyclonedx-npm --output-file dist/bom.json",
     "check": "npm run lint && npm run test && npm run build",
     "verify": "npm run check"
   },
   "devDependencies": {
+    "@cyclonedx/cyclonedx-npm": "^6.0.0",
     "@eslint/js": "^10.0.1",
     "eslint": "^10.8.0",
     "globals": "^17.8.0",
+    "jsdom": "^28.1.0",
     "prettier": "^3.9.6",
     "vite": "^8.2.0",
     "vitest": "^4.1.10"
