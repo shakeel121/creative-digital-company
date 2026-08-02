@@ -34,8 +34,11 @@ Findings from all SARIF-producing tools are uploaded to GitHub code scanning
   `level: error` when no numeric severity exists. Implemented in
   `scripts/sarif-gate.js` (threshold overridable with `SAST_THRESHOLD`).
 - **Dependency/container upgrades:** Dependabot opens weekly PRs; security PRs are merged on
-  priority. Trivy runs with `ignore-unfixed: true` — **unfixed upstream vulnerabilities that have
-  no fix are tracked in vulnerability management by SecLead**, not silently ignored.
+  priority. Trivy runs with `ignore-unfixed: true`, so **unfixed upstream vulnerabilities never
+  surface as code-scanning alerts — the weekly sweep's unfixed-backlog scan**
+  (`trivy fs --ignore-unfixed=false --severity CRITICAL,HIGH --list-all`, per
+  [VULNERABILITY_MANAGEMENT.md §2](/CRE/issues/CRE-68#document-vulnerability-management))
+  surfaces them and SecLead tracks them as `track-unfixed`, not silently ignored.
 - **Accepting a risk:** never silence a scanner by editing the lockfile or deleting a report.
   Add the CVE/GHSA id to `.trivyignore` **with** a `# tracking: <PREFIX>-NNN` reference, or
   exclude a Semgrep rule via `SAST_IGNORE_RULES` (GitHub variable, wired into the `security`
