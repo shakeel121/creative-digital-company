@@ -42,6 +42,8 @@ jobs:
       security-events: write
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Validate risk-acceptance config (SecLead sign-off gate)
         shell: bash
