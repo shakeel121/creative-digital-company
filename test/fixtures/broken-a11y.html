@@ -1,0 +1,42 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Broken a11y fixture — CRE-40 regression demo</title>
+  </head>
+  <body>
+    <main>
+      <h1>Deliberately broken accessibility fixture</h1>
+
+      <section>
+        <h2>Buttons</h2>
+        <div class="cdc-button cdc-button--primary">Clickable div, not a button</div>
+        <button class="cdc-button cdc-button--secondary" type="button">
+          <svg aria-hidden="true" viewBox="0 0 16 16" width="16" height="16" fill="currentColor">
+            <path d="M11.7 10.6a5.5 5.5 0 1 0-1.1 1.1l3.3 3.3 1.1-1.1-3.3-3.3Z" />
+          </svg>
+        </button>
+      </section>
+
+      <section>
+        <h2>Form</h2>
+        <form class="cdc-form">
+          <div class="cdc-field">
+            <label class="cdc-label">Email</label>
+            <input class="cdc-input" type="email" id="email" name="email" />
+          </div>
+        </form>
+      </section>
+
+      <section>
+        <h2>Nav</h2>
+        <nav class="cdc-nav" aria-label="Primary">
+          <button class="cdc-nav__toggle" type="button" aria-expanded="false" aria-controls="does-not-exist">
+            Toggle menu
+          </button>
+        </nav>
+      </section>
+    </main>
+  </body>
+</html>
