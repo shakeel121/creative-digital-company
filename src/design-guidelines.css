@@ -1,0 +1,268 @@
+/*
+ * Creative Digital Company — Design guidelines page styles (M3-3 / CRE-35)
+ *
+ * Page-specific presentation for design-guidelines.html. Only design tokens
+ * are referenced via var(...) — no hardcoded brand values (the token contract
+ * in CRE-33 forbids stray values, and the deployed CSP style-src 'self' forbids
+ * inline style attributes).
+ */
+
+.dg-hero {
+  padding: var(--space-12) 0 var(--space-10);
+}
+
+.dg-hero h1 {
+  font-size: var(--text-display);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-tight);
+  max-width: 18ch;
+  margin: 0 0 var(--container-pad);
+}
+
+.dg-lede {
+  color: var(--color-text-muted);
+  font-size: var(--text-lg);
+  max-width: 60ch;
+  margin: 0 0 var(--space-6);
+}
+
+.dg-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.dg-section {
+  padding: var(--space-10) 0;
+  border-top: 1px solid var(--color-border);
+  scroll-margin-top: 5rem;
+}
+
+.dg-section h2 {
+  font-size: var(--text-3xl);
+  letter-spacing: var(--tracking-heading);
+  margin: 0 0 var(--space-6);
+}
+
+.dg-section h3 {
+  font-size: var(--text-2xl);
+  letter-spacing: var(--tracking-heading);
+  line-height: var(--leading-heading);
+  margin: var(--space-8) 0 var(--space-3);
+}
+
+.dg-section p,
+.dg-section li {
+  max-width: 72ch;
+}
+
+.dg-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: var(--space-5);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.dg-note {
+  margin: 0 0 var(--space-4);
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+.dg-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-base);
+  margin: var(--space-3) 0 var(--space-6);
+}
+
+.dg-table th,
+.dg-table td {
+  text-align: left;
+  padding: var(--space-3);
+  border-bottom: 1px solid var(--color-border);
+  vertical-align: top;
+}
+
+.dg-table th {
+  color: var(--color-text-subtle);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+}
+
+.dg-table td code,
+.dg-table td .dg-mono {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+}
+
+.dg-swatch {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.dg-swatch__chip {
+  display: block;
+  height: 3rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  margin-bottom: var(--space-1);
+}
+
+.dg-swatch__token {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+}
+
+.dg-swatch__value {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+}
+
+.dg-swatch__chip[data-token='ink-0'] {
+  background-color: var(--ink-0);
+}
+.dg-swatch__chip[data-token='ink-50'] {
+  background-color: var(--ink-50);
+}
+.dg-swatch__chip[data-token='ink-100'] {
+  background-color: var(--ink-100);
+}
+.dg-swatch__chip[data-token='ink-200'] {
+  background-color: var(--ink-200);
+}
+.dg-swatch__chip[data-token='ink-300'] {
+  background-color: var(--ink-300);
+}
+.dg-swatch__chip[data-token='ink-400'] {
+  background-color: var(--ink-400);
+}
+.dg-swatch__chip[data-token='ink-500'] {
+  background-color: var(--ink-500);
+}
+.dg-swatch__chip[data-token='ink-600'] {
+  background-color: var(--ink-600);
+}
+.dg-swatch__chip[data-token='ink-700'] {
+  background-color: var(--ink-700);
+}
+.dg-swatch__chip[data-token='ink-800'] {
+  background-color: var(--ink-800);
+}
+.dg-swatch__chip[data-token='ink-850'] {
+  background-color: var(--ink-850);
+}
+.dg-swatch__chip[data-token='ink-900'] {
+  background-color: var(--ink-900);
+}
+.dg-swatch__chip[data-token='ink-950'] {
+  background-color: var(--ink-950);
+}
+.dg-swatch__chip[data-token='accent-50'] {
+  background-color: var(--accent-50);
+}
+.dg-swatch__chip[data-token='accent-100'] {
+  background-color: var(--accent-100);
+}
+.dg-swatch__chip[data-token='accent-200'] {
+  background-color: var(--accent-200);
+}
+.dg-swatch__chip[data-token='accent-300'] {
+  background-color: var(--accent-300);
+}
+.dg-swatch__chip[data-token='accent-400'] {
+  background-color: var(--accent-400);
+}
+.dg-swatch__chip[data-token='accent-500'] {
+  background-color: var(--accent-500);
+}
+.dg-swatch__chip[data-token='accent-600'] {
+  background-color: var(--accent-600);
+}
+.dg-swatch__chip[data-token='accent-700'] {
+  background-color: var(--accent-700);
+}
+.dg-swatch__chip[data-token='accent-800'] {
+  background-color: var(--accent-800);
+}
+.dg-swatch__chip[data-token='accent-900'] {
+  background-color: var(--accent-900);
+}
+.dg-swatch__chip[data-token='success-700'] {
+  background-color: var(--success-700);
+}
+.dg-swatch__chip[data-token='success-500'] {
+  background-color: var(--success-500);
+}
+.dg-swatch__chip[data-token='warning-700'] {
+  background-color: var(--warning-700);
+}
+.dg-swatch__chip[data-token='warning-500'] {
+  background-color: var(--warning-500);
+}
+.dg-swatch__chip[data-token='danger-700'] {
+  background-color: var(--danger-700);
+}
+.dg-swatch__chip[data-token='danger-500'] {
+  background-color: var(--danger-500);
+}
+
+.dg-logo-card {
+  align-items: center;
+}
+
+.dg-logo-card img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+.dg-logo-card--dark {
+  background: var(--ink-950);
+  border-color: var(--color-border);
+}
+
+.dg-logo-card--light {
+  background: var(--ink-0);
+}
+
+.dg-sample {
+  margin: 0;
+}
+
+.dg-sample--xs {
+  font-size: var(--text-xs);
+}
+.dg-sample--sm {
+  font-size: var(--text-sm);
+}
+.dg-sample--base {
+  font-size: var(--text-base);
+}
+.dg-sample--lg {
+  font-size: var(--text-lg);
+}
+.dg-sample--xl {
+  font-size: var(--text-xl);
+}
+.dg-sample--2xl {
+  font-size: var(--text-2xl);
+}
+.dg-sample--3xl {
+  font-size: var(--text-3xl);
+}
+.dg-sample--4xl {
+  font-size: var(--text-4xl);
+}
+.dg-sample--display {
+  font-size: var(--text-display);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-tight);
+}

@@ -11,6 +11,14 @@ const htmlPath = join(root, 'index.html');
 
 const tokens = readFileSync(tokensPath, 'utf8');
 const style = readFileSync(stylePath, 'utf8');
+const appCss = [
+  stylePath,
+  ...['button', 'card', 'form', 'nav', 'footer'].map((name) =>
+    join(root, 'src', 'components', `${name}.css`),
+  ),
+]
+  .map((path) => readFileSync(path, 'utf8'))
+  .join('\n');
 const main = readFileSync(mainPath, 'utf8');
 const html = readFileSync(htmlPath, 'utf8');
 
@@ -26,7 +34,7 @@ describe('design tokens module (src/tokens/tokens.css)', () => {
   });
 });
 
-describe('site consumes module tokens (src/style.css)', () => {
+describe('site consumes module tokens (app stylesheet surface)', () => {
   it('no longer defines an ad-hoc :root token block', () => {
     expect(style).not.toMatch(/:root\s*\{/);
   });
@@ -51,7 +59,10 @@ describe('site consumes module tokens (src/style.css)', () => {
     '--container-max',
     '--nav-height',
   ])('references module token category %s', (token) => {
-    expect(style).toContain(`var(${token}`);
+    // M3-2 moved component styles (and their token references) into
+    // src/components/*.css, so the token-consumption contract is checked
+    // across the whole app stylesheet surface, not just src/style.css.
+    expect(appCss).toContain(`var(${token}`);
   });
 });
 

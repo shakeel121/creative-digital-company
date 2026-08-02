@@ -14,23 +14,27 @@
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
 
-    <header class="site-header">
-      <nav class="nav" aria-label="Primary">
-        <a class="brand" href="#top">CDC<span class="brand-dot">.</span></a>
+    <header class="cdc-header">
+      <nav class="cdc-nav" aria-label="Primary">
+        <a class="cdc-nav__brand" href="#top">
+          <img src="./src/brand/logo-wordmark-inverse.svg" alt="Creative Digital Company — CDC." />
+        </a>
         <button
-          class="nav-toggle"
+          class="cdc-nav__toggle"
           type="button"
           aria-expanded="false"
           aria-controls="nav-menu"
           aria-label="Toggle menu"
+          data-cdc-nav-toggle
         >
-          <span class="nav-toggle-bar"></span>
-          <span class="nav-toggle-bar"></span>
+          <span class="cdc-nav__toggle-bar"></span>
+          <span class="cdc-nav__toggle-bar"></span>
         </button>
-        <ul class="nav-list" id="nav-menu">
-          <li><a href="#services">Services</a></li>
-          <li><a href="#work">Work</a></li>
-          <li><a href="#contact">Contact</a></li>
+        <ul class="cdc-nav__list" id="nav-menu" data-cdc-nav-menu>
+          <li><a class="cdc-nav__link" href="#services">Services</a></li>
+          <li><a class="cdc-nav__link" href="#work">Work</a></li>
+          <li><a class="cdc-nav__link" href="#contact">Contact</a></li>
+          <li><a class="cdc-nav__link" href="./design-guidelines.html">Design</a></li>
         </ul>
       </nav>
     </header>
@@ -42,37 +46,37 @@
           Creative Digital Company is a design and development studio. We pair sharp strategy with
           careful craft to ship websites, brands, and experiences that work as hard as they look.
         </p>
-        <a class="btn btn-primary" href="#contact">Start a project</a>
+        <a class="cdc-button cdc-button--primary" href="#contact">Start a project</a>
       </section>
 
       <section id="services" class="section">
         <p class="kicker">What we do</p>
         <h2>Services</h2>
-        <ul class="card-grid">
-          <li class="card">
-            <h3>Brand identity</h3>
-            <p>
+        <ul class="cdc-card-grid">
+          <li class="cdc-card">
+            <h3 class="cdc-card__title">Brand identity</h3>
+            <p class="cdc-card__body">
               Naming, visual systems, and guidelines that give your company a clear, consistent
               voice.
             </p>
           </li>
-          <li class="card">
-            <h3>Web design</h3>
-            <p>
+          <li class="cdc-card">
+            <h3 class="cdc-card__title">Web design</h3>
+            <p class="cdc-card__body">
               Accessible, fast, and considered interfaces — designed around how people actually use
               them.
             </p>
           </li>
-          <li class="card">
-            <h3>Development</h3>
-            <p>
+          <li class="cdc-card">
+            <h3 class="cdc-card__title">Development</h3>
+            <p class="cdc-card__body">
               Modern, well-tested builds from static sites to full products, with CI and a
               verification loop.
             </p>
           </li>
-          <li class="card">
-            <h3>Digital campaigns</h3>
-            <p>Landing pages and campaign assets that convert attention into action.</p>
+          <li class="cdc-card">
+            <h3 class="cdc-card__title">Digital campaigns</h3>
+            <p class="cdc-card__body">Landing pages and campaign assets that convert attention into action.</p>
           </li>
         </ul>
       </section>
@@ -80,14 +84,14 @@
       <section id="work" class="section">
         <p class="kicker">Selected work</p>
         <h2>Work</h2>
-        <ul class="card-grid">
-          <li class="card">
-            <h3>Company website</h3>
-            <p>This site — the first milestone of our own digital foundation.</p>
+        <ul class="cdc-card-grid">
+          <li class="cdc-card cdc-card--featured">
+            <h3 class="cdc-card__title">Company website</h3>
+            <p class="cdc-card__body">This site — the first milestone of our own digital foundation.</p>
           </li>
-          <li class="card">
-            <h3>Coming soon</h3>
-            <p>
+          <li class="cdc-card">
+            <h3 class="cdc-card__title">Coming soon</h3>
+            <p class="cdc-card__body">
               Case studies land here as Workstream B &amp; C ramp up branding and design direction.
             </p>
           </li>
@@ -101,13 +105,47 @@
           Have a project in mind? Write to us at
           <a class="email-link" href="mailto:hello@creative-digital.example"
             >hello@creative-digital.example</a
-          >.
+          > or send a message below.
         </p>
+        <form class="cdc-form" data-cdc-form action="mailto:hello@creative-digital.example" method="post" enctype="text/plain">
+          <div class="cdc-field">
+            <label class="cdc-label" for="contact-name">Name <span class="cdc-label__asterisk" aria-hidden="true">*</span></label>
+            <input class="cdc-input" type="text" id="contact-name" name="name" required aria-describedby="contact-name-error" />
+            <p class="cdc-error" id="contact-name-error" role="alert" hidden>
+              <span data-cdc-error-text>Please enter your name.</span>
+            </p>
+          </div>
+          <div class="cdc-field">
+            <label class="cdc-label" for="contact-email">Email <span class="cdc-label__asterisk" aria-hidden="true">*</span></label>
+            <input class="cdc-input" type="email" id="contact-email" name="email" required aria-describedby="contact-email-error" />
+            <p class="cdc-error" id="contact-email-error" role="alert" hidden>
+              <span data-cdc-error-text>Please enter a valid email address.</span>
+            </p>
+          </div>
+          <div class="cdc-field">
+            <label class="cdc-label" for="contact-message">Message <span class="cdc-label__asterisk" aria-hidden="true">*</span></label>
+            <textarea class="cdc-textarea" id="contact-message" name="message" rows="4" required aria-describedby="contact-message-error"></textarea>
+            <p class="cdc-error" id="contact-message-error" role="alert" hidden>
+              <span data-cdc-error-text>Please enter a message.</span>
+            </p>
+          </div>
+          <div>
+            <button class="cdc-button cdc-button--primary" type="submit">Send message</button>
+          </div>
+        </form>
       </section>
     </main>
 
-    <footer class="site-footer">
-      <p>&copy; <span id="year"></span> Creative Digital Company. All rights reserved.</p>
+    <footer class="cdc-footer">
+      <div class="cdc-footer__inner">
+        <p class="cdc-footer__legal">&copy; <span id="year"></span> Creative Digital Company. All rights reserved.</p>
+        <nav class="cdc-footer__nav" aria-label="Footer">
+          <a href="#services">Services</a>
+          <a href="#work">Work</a>
+          <a href="#contact">Contact</a>
+          <a href="./design-guidelines.html">Design</a>
+        </nav>
+      </div>
     </footer>
 
     <script type="module" src="./src/main.js"></script>
