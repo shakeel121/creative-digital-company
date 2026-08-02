@@ -151,6 +151,7 @@ function lint(document) {
 
 const examplesPath = join(root, 'examples.html');
 const indexHtmlPath = join(root, 'index.html');
+const guidelinesPath = join(root, 'design-guidelines.html');
 const fixturesDir = join(root, 'test', 'fixtures');
 const brokenPath = join(fixturesDir, 'broken-a11y.html');
 
@@ -205,6 +206,28 @@ describe('a11y: adopted home page (index.html) renders with no violations (M3-2.
     ]) {
       expect(doc.querySelectorAll(selector).length, `missing component ${selector} in index.html`).toBeGreaterThan(0);
     }
+  });
+});
+
+describe('a11y: design-guidelines page renders with no violations (M3-3 / CRE-35)', () => {
+  it('design-guidelines.html exists and parses', () => {
+    expect(existsSync(guidelinesPath)).toBe(true);
+    const doc = parse(read(guidelinesPath));
+    expect(doc.querySelectorAll('*').length).toBeGreaterThan(0);
+  });
+
+  it('reports zero a11y-critical violations', () => {
+    const doc = parse(read(guidelinesPath));
+    const issues = lint(doc);
+    expect(issues).toEqual([]);
+  });
+
+  it('uses the shared component shell (nav + footer + button)', () => {
+    const doc = parse(read(guidelinesPath));
+    for (const selector of ['.cdc-button', '.cdc-nav', '.cdc-footer']) {
+      expect(doc.querySelectorAll(selector).length, `missing component ${selector} in design-guidelines.html`).toBeGreaterThan(0);
+    }
+    expect(doc.querySelectorAll('h1').length).toBe(1);
   });
 });
 

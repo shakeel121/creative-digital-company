@@ -1,0 +1,482 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Design guidelines for Creative Digital Company — the single source of truth for our brand identity, color palette, typography, spacing, motion, components, and accessibility baseline."
+    />
+    <meta name="theme-color" content="#0c0c10" />
+    <title>Design guidelines — Creative Digital Company</title>
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <header class="cdc-header">
+      <nav class="cdc-nav" aria-label="Primary">
+        <a class="cdc-nav__brand" href="./index.html">
+          <img
+            src="./src/brand/logo-wordmark-inverse.svg"
+            alt="Creative Digital Company — CDC."
+          />
+        </a>
+        <button
+          class="cdc-nav__toggle"
+          type="button"
+          aria-expanded="false"
+          aria-controls="nav-menu"
+          aria-label="Toggle menu"
+          data-cdc-nav-toggle
+        >
+          <span class="cdc-nav__toggle-bar"></span>
+          <span class="cdc-nav__toggle-bar"></span>
+        </button>
+        <ul class="cdc-nav__list" id="nav-menu" data-cdc-nav-menu>
+          <li><a class="cdc-nav__link" href="./index.html">Home</a></li>
+          <li><a class="cdc-nav__link" href="#brand">Brand</a></li>
+          <li><a class="cdc-nav__link" href="#color">Color</a></li>
+          <li><a class="cdc-nav__link" href="#type">Type</a></li>
+          <li><a class="cdc-nav__link" href="#space">Space</a></li>
+          <li><a class="cdc-nav__link" href="#motion">Motion</a></li>
+          <li><a class="cdc-nav__link" href="#components">Components</a></li>
+          <li><a class="cdc-nav__link" href="#accessibility">Accessibility</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main id="main">
+      <section id="top" class="dg-hero">
+        <p class="kicker">Design system</p>
+        <h1>Design guidelines</h1>
+        <p class="dg-lede">
+          How we make Creative Digital Company feel unmistakably itself — the tokens,
+          components, and accessibility baseline behind every page we ship. This page is the
+          living reference for the design system: brand identity, color, type, spacing, motion,
+          and reusable UI.
+        </p>
+        <div class="dg-actions">
+          <a class="cdc-button cdc-button--primary" href="./index.html">See the site</a>
+        </div>
+      </section>
+
+      <section id="brand" class="dg-section">
+        <p class="kicker">01 · Brand</p>
+        <h2>Brand identity</h2>
+        <p>
+          Creative Digital Company — a design and development studio. The wordmark is
+          <strong>CDC.</strong>, always set with the terminal accent dot. Our tagline:
+          "We build brands and digital products people remember."
+        </p>
+        <h3>Logo assets</h3>
+        <ul class="dg-grid">
+          <li class="cdc-card dg-logo-card">
+            <h3 class="cdc-card__title">Light surface</h3>
+            <div class="dg-logo-card dg-logo-card--light">
+              <img src="./src/brand/logo-wordmark.svg" alt="CDC. wordmark for light surfaces" />
+            </div>
+            <p class="cdc-card__body">
+              Use <code>logo-wordmark.svg</code> on light backgrounds. Clearance of one stroke
+              height on all sides; minimum width 140px.
+            </p>
+          </li>
+          <li class="cdc-card dg-logo-card">
+            <h3 class="cdc-card__title">Dark surface</h3>
+            <div class="dg-logo-card dg-logo-card--dark">
+              <img
+                src="./src/brand/logo-wordmark-inverse.svg"
+                alt="CDC. wordmark for dark surfaces"
+              />
+            </div>
+            <p class="cdc-card__body">
+              Use <code>logo-wordmark-inverse.svg</code> on dark backgrounds. Never place an ink
+              logo on ink, or a light logo on white.
+            </p>
+          </li>
+          <li class="cdc-card dg-logo-card">
+            <h3 class="cdc-card__title">Mark</h3>
+            <div class="dg-logo-card dg-logo-card--dark">
+              <img src="./src/brand/logo-mark-inverse.svg" alt="Creative Digital Company mark" />
+            </div>
+            <p class="cdc-card__body">
+              The C with a terminal dot is our mark. Minimum size 24px; don't rotate, recolor the
+              dot away from the accent, or add effects.
+            </p>
+          </li>
+        </ul>
+      </section>
+
+      <section id="color" class="dg-section">
+        <p class="kicker">02 · Color</p>
+        <h2>Color palette</h2>
+        <p>
+          Every color is a named token in <code>src/brand/brand.css</code>. Text pairings meet
+          WCAG 2.1 AA (≥ 4.5:1). Accent <code>--accent-500</code> is a fill color; for body text
+          use <code>--accent-700</code> on light and <code>--accent-400</code> on dark.
+        </p>
+        <h3>Ink — neutrals</h3>
+        <ul class="dg-grid">
+          <li class="cdc-card dg-swatch">
+            <span class="dg-swatch__chip" data-token="ink-0"></span>
+            <p class="dg-swatch__token">--ink-0</p>
+            <p class="dg-swatch__value">#ffffff</p>
+          </li>
+          <li class="cdc-card dg-swatch">
+            <span class="dg-swatch__chip" data-token="ink-50"></span>
+            <p class="dg-swatch__token">--ink-50</p>
+            <p class="dg-swatch__value">#f4f4f6</p>
+          </li>
+          <li class="cdc-card dg-swatch">
+            <span class="dg-swatch__chip" data-token="ink-100"></span>
+            <p class="dg-swatch__token">--ink-100</p>
+            <p class="dg-swatch__value">#e4e4e9</p>
+          </li>
+          <li class="cdc-card dg-swatch">
+            <span class="dg-swatch__chip" data-token="ink-200"></span>
+            <p class="dg-swatch__token">--ink-200</p>
+            <p class="dg-swatch__value">#c8c8d0</p>
+          </li>
+          <li class="cdc-card dg-swatch">
+            <span class="dg-swatch__chip" data-token="ink-300"></span>
+            <p class="dg-swatch__token">--ink-300</p>
+            <p class="dg-swatch__value">#a2a2ad</p>
+          </li>
+          <li class="cdc-card dg-swatch">
+            <span class="dg-swatch__chip" data-token="ink-400"></span>
+            <p class="dg-swatch__token">--ink-400</p>
+            <p class="dg-swatch__value">#84848e</p>
+          </li>
+          <li class="cdc-card dg-swatch">
+            <span class="dg-swatch__chip" data-token="ink-500"></span>
+            <p class="dg-swatch__token">--ink-500</p>
+            <p class="dg-swatch__value">#6f6f7a</p>
+          </li>
+          <li class="cdc-card dg-swatch">
+            <span class="dg-swatch__chip" data-token="ink-600"></span>
+            <p class="dg-swatch__token">--ink-600</p>
+            <p class="dg-swatch__value">#55555f</p>
+          </li>
+          <li class="cdc-card dg-swatch">
+            <span class="dg-swatch__chip" data-token="ink-700"></span>
+            <p class="dg-swatch__token">--ink-700</p>
+            <p class="dg-swatch__value">#3a3a44</p>
+          </li>
+          <li class="cdc-card dg-swatch">
+            <span class="dg-swatch__chip" data-token="ink-800"></span>
+            <p class="dg-swatch__token">--ink-800</p>
+            <p class="dg-swatch__value">#26262f</p>
+          </li>
+          <li class="cdc-card dg-swatch">
+            <span class="dg-swatch__chip" data-token="ink-850"></span>
+            <p class="dg-swatch__token">--ink-850</p>
+            <p class="dg-swatch__value">#1b1b24</p>
+          </li>
+          <li class="cdc-card dg-swatch">
+            <span class="dg-swatch__chip" data-token="ink-900"></span>
+            <p class="dg-swatch__token">--ink-900</p>
+            <p class="dg-swatch__value">#14141b</p>
+          </li>
+          <li class="cdc-card dg-swatch">
+            <span class="dg-swatch__chip" data-token="ink-950"></span>
+            <p class="dg-swatch__token">--ink-950</p>
+            <p class="dg-swatch__value">#0c0c10</p>
+          </li>
+        </ul>
+        <h3>Accent — vermilion</h3>
+        <ul class="dg-grid">
+          <li class="cdc-card dg-swatch">
+            <span class="dg-swatch__chip" data-token="accent-50"></span>
+            <p class="dg-swatch__token">--accent-50</p>
+            <p class="dg-swatch__value">#fff1ed</p>
+          </li>
+          <li class="cdc-card dg-swatch">
+            <span class="dg-swatch__chip" data-token="accent-100"></span>
+            <p class="dg-swatch__token">--accent-100</p>
+            <p class="dg-swatch__value">#ffe3d8</p>
+          </li>
+          <li class="cdc-card dg-swatch">
+            <span class="dg-swatch__chip" data-token="accent-200"></span>
+            <p class="dg-swatch__token">--accent-200</p>
+            <p class="dg-swatch__value">#ffc4b0</p>
+          </li>
+          <li class="cdc-card dg-swatch">
+            <span class="dg-swatch__chip" data-token="accent-300"></span>
+            <p class="dg-swatch__token">--accent-300</p>
+            <p class="dg-swatch__value">#ffa388</p>
+          </li>
+          <li class="cdc-card dg-swatch">
+            <span class="dg-swatch__chip" data-token="accent-400"></span>
+            <p class="dg-swatch__token">--accent-400</p>
+            <p class="dg-swatch__value">#ff845f</p>
+          </li>
+          <li class="cdc-card dg-swatch">
+            <span class="dg-swatch__chip" data-token="accent-500"></span>
+            <p class="dg-swatch__token">--accent-500</p>
+            <p class="dg-swatch__value">#ff5c38</p>
+          </li>
+          <li class="cdc-card dg-swatch">
+            <span class="dg-swatch__chip" data-token="accent-600"></span>
+            <p class="dg-swatch__token">--accent-600</p>
+            <p class="dg-swatch__value">#f04a24</p>
+          </li>
+          <li class="cdc-card dg-swatch">
+            <span class="dg-swatch__chip" data-token="accent-700"></span>
+            <p class="dg-swatch__token">--accent-700</p>
+            <p class="dg-swatch__value">#d23b16</p>
+          </li>
+          <li class="cdc-card dg-swatch">
+            <span class="dg-swatch__chip" data-token="accent-800"></span>
+            <p class="dg-swatch__token">--accent-800</p>
+            <p class="dg-swatch__value">#b02f12</p>
+          </li>
+          <li class="cdc-card dg-swatch">
+            <span class="dg-swatch__chip" data-token="accent-900"></span>
+            <p class="dg-swatch__token">--accent-900</p>
+            <p class="dg-swatch__value">#8f2510</p>
+          </li>
+        </ul>
+        <h3>Semantic — success, warning, danger</h3>
+        <ul class="dg-grid">
+          <li class="cdc-card dg-swatch">
+            <span class="dg-swatch__chip" data-token="success-700"></span>
+            <p class="dg-swatch__token">--success-700</p>
+            <p class="dg-swatch__value">#1e7d3c</p>
+          </li>
+          <li class="cdc-card dg-swatch">
+            <span class="dg-swatch__chip" data-token="success-500"></span>
+            <p class="dg-swatch__token">--success-500</p>
+            <p class="dg-swatch__value">#46c968</p>
+          </li>
+          <li class="cdc-card dg-swatch">
+            <span class="dg-swatch__chip" data-token="warning-700"></span>
+            <p class="dg-swatch__token">--warning-700</p>
+            <p class="dg-swatch__value">#9a6700</p>
+          </li>
+          <li class="cdc-card dg-swatch">
+            <span class="dg-swatch__chip" data-token="warning-500"></span>
+            <p class="dg-swatch__token">--warning-500</p>
+            <p class="dg-swatch__value">#f5a623</p>
+          </li>
+          <li class="cdc-card dg-swatch">
+            <span class="dg-swatch__chip" data-token="danger-700"></span>
+            <p class="dg-swatch__token">--danger-700</p>
+            <p class="dg-swatch__value">#b91c1c</p>
+          </li>
+          <li class="cdc-card dg-swatch">
+            <span class="dg-swatch__chip" data-token="danger-500"></span>
+            <p class="dg-swatch__token">--danger-500</p>
+            <p class="dg-swatch__value">#ff6b6b</p>
+          </li>
+        </ul>
+      </section>
+
+      <section id="type" class="dg-section">
+        <p class="kicker">03 · Type</p>
+        <h2>Typography</h2>
+        <p>
+          Inter is the brand face, served from the system stack so pages never pay a font-FOIT
+          tax. Exactly nine sizes, six weights, and three tracking tokens — sizes always come
+          from the scale.
+        </p>
+        <table class="dg-table">
+          <thead>
+            <tr>
+              <th scope="col">Token</th>
+              <th scope="col">Size</th>
+              <th scope="col">Sample</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>--text-xs</code></td>
+              <td><code>0.75rem</code></td>
+              <td><p class="dg-sample dg-sample--xs">Caption</p></td>
+            </tr>
+            <tr>
+              <td><code>--text-sm</code></td>
+              <td><code>0.875rem</code></td>
+              <td><p class="dg-sample dg-sample--sm">Helper, nav</p></td>
+            </tr>
+            <tr>
+              <td><code>--text-base</code></td>
+              <td><code>1rem</code></td>
+              <td><p class="dg-sample dg-sample--base">Body</p></td>
+            </tr>
+            <tr>
+              <td><code>--text-lg</code></td>
+              <td><code>1.125rem</code></td>
+              <td><p class="dg-sample dg-sample--lg">Lead</p></td>
+            </tr>
+            <tr>
+              <td><code>--text-xl</code></td>
+              <td><code>1.375rem</code></td>
+              <td><p class="dg-sample dg-sample--xl">Card title</p></td>
+            </tr>
+            <tr>
+              <td><code>--text-2xl</code></td>
+              <td><code>1.75rem</code></td>
+              <td><p class="dg-sample dg-sample--2xl">Section sub-header</p></td>
+            </tr>
+            <tr>
+              <td><code>--text-3xl</code></td>
+              <td><code>2.25rem</code></td>
+              <td><p class="dg-sample dg-sample--3xl">Section header</p></td>
+            </tr>
+            <tr>
+              <td><code>--text-4xl</code></td>
+              <td><code>3rem</code></td>
+              <td><p class="dg-sample dg-sample--4xl">Page hero</p></td>
+            </tr>
+            <tr>
+              <td><code>--text-display</code></td>
+              <td><code>clamp(2.5rem, 6vw, 4.5rem)</code></td>
+              <td><p class="dg-sample dg-sample--display">Hero display</p></td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="dg-note">
+          Weights: regular 400 · medium 500 · semibold 600 · bold 700 · extrabold 800 (wordmark).
+          Tracking: display −0.03em, headings −0.02em, kickers +0.12em (uppercase).
+        </p>
+      </section>
+
+      <section id="space" class="dg-section">
+        <p class="kicker">04 · Space</p>
+        <h2>Spacing, radii, shadows</h2>
+        <p>
+          A 4px-based spacing scale is the single source of truth — no stray rem values in
+          components. Radii keep the current site radius (14px) as the default card radius.
+        </p>
+        <table class="dg-table">
+          <thead>
+            <tr>
+              <th scope="col">Token</th>
+              <th scope="col">Value</th>
+              <th scope="col">Use</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>--space-1 … --space-16</code></td>
+              <td><code>0.25rem → 8rem</code></td>
+              <td>All margins and padding</td>
+            </tr>
+            <tr>
+              <td><code>--radius-sm / md / lg / xl / full</code></td>
+              <td><code>8 / 14 / 20 / 28px · full</code></td>
+              <td>Inputs · cards · surfaces · pills</td>
+            </tr>
+            <tr>
+              <td><code>--shadow-sm / md / lg</code></td>
+              <td>theme-aware</td>
+              <td>Elevation</td>
+            </tr>
+            <tr>
+              <td><code>--shadow-accent</code></td>
+              <td>coral glow</td>
+              <td>Primary button hover</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section id="motion" class="dg-section">
+        <p class="kicker">05 · Motion</p>
+        <h2>Motion</h2>
+        <p>
+          Micro-interactions run at 100ms, standard transitions at 200ms, and nothing essential
+          exceeds 500ms. Under <code>prefers-reduced-motion: reduce</code> all non-essential
+          animation is disabled (WCAG 2.3.3).
+        </p>
+        <ul class="dg-list">
+          <li><code>--duration-fast</code> 100ms · hover states, focus flicks</li>
+          <li><code>--duration-base</code> 200ms · transitions, toggles</li>
+          <li><code>--duration-slow</code> 500ms · reserved, large surfaces only</li>
+          <li><code>--ease-out</code> <code>cubic-bezier(0.22, 1, 0.36, 1)</code> · entrances</li>
+          <li><code>--ease-in-out</code> <code>cubic-bezier(0.65, 0, 0.35, 1)</code> · exits</li>
+        </ul>
+      </section>
+
+      <section id="components" class="dg-section">
+        <p class="kicker">06 · Components</p>
+        <h2>Component library</h2>
+        <p>
+          Reusable, accessible UI lives in <code>src/components/</code> and consumes design tokens
+          only. Use the component classes in new markup — never hand-roll styles that duplicate
+          them.
+        </p>
+        <table class="dg-table">
+          <thead>
+            <tr>
+              <th scope="col">Component</th>
+              <th scope="col">Class</th>
+              <th scope="col">Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Button</td>
+              <td><code>.cdc-button</code></td>
+              <td>Navigation uses <code>&lt;a&gt;</code>, actions use <code>&lt;button&gt;</code></td>
+            </tr>
+            <tr>
+              <td>Card</td>
+              <td><code>.cdc-card</code></td>
+              <td>Interactive cards expose a real link — no click handlers on the card</td>
+            </tr>
+            <tr>
+              <td>Form</td>
+              <td><code>.cdc-field</code></td>
+              <td>Labeled controls, error text bound via <code>aria-describedby</code></td>
+            </tr>
+            <tr>
+              <td>Nav</td>
+              <td><code>.cdc-nav</code></td>
+              <td>One primary landmark; footer nav carries a distinct label</td>
+            </tr>
+            <tr>
+              <td>Footer</td>
+              <td><code>.cdc-footer</code></td>
+              <td>Body-level footer maps to the contentinfo landmark</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="dg-actions">
+          <a class="cdc-button cdc-button--secondary" href="./examples.html">Component examples</a>
+        </div>
+      </section>
+
+      <section id="accessibility" class="dg-section">
+        <p class="kicker">07 · Accessibility</p>
+        <h2>Accessibility baseline (WCAG 2.1 AA)</h2>
+        <ul class="dg-list">
+          <li>All text pairings meet AA (≥ 4.5:1); body and muted text are AAA in both themes.</li>
+          <li>Focus is always visible: <code>--color-focus</code> outline with offset, and
+            <code>:focus-within</code> on interactive cards.</li>
+          <li>Color is never the only channel for state — pair with a glyph or label.</li>
+          <li>Touch targets are ≥ 44×44px; text links ≥ 24px.</li>
+          <li>Skip link, landmark nav, one <code>h1</code> per page, and labeled form controls are
+            required on every page.</li>
+          <li>The automated a11y lint in <code>test/a11y-components.test.js</code> enforces this
+            baseline in CI.</li>
+        </ul>
+      </section>
+    </main>
+
+    <footer class="cdc-footer">
+      <div class="cdc-footer__inner">
+        <p class="cdc-footer__legal">
+          &copy; <span id="year"></span> Creative Digital Company. All rights reserved.
+        </p>
+        <nav class="cdc-footer__nav" aria-label="Footer">
+          <a href="./index.html">Home</a>
+          <a href="./examples.html">Examples</a>
+          <a href="#top">Design guidelines</a>
+        </nav>
+      </div>
+    </footer>
+
+    <script type="module" src="./src/design-guidelines.js"></script>
+  </body>
+</html>

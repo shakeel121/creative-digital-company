@@ -45,6 +45,12 @@
   color: var(--color-accent);
 }
 
+.cdc-nav__brand img {
+  display: block;
+  height: 2.75rem;
+  width: auto;
+}
+
 .cdc-nav__list {
   display: flex;
   align-items: center;

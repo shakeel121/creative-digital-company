@@ -54,6 +54,14 @@ describe('smoke: the production build loads and serves the site', () => {
     }
   });
 
+  it('serves every shipped page in the multi-page build', async () => {
+    for (const page of ['/design-guidelines.html', '/examples.html']) {
+      const res = await fetch(`${baseUrl}${page}`);
+      expect(res.status, `${page} should be served`).toBe(200);
+      expect(res.headers.get('content-type')).toMatch(/text\/html/);
+    }
+  });
+
   it('serves every asset referenced by the page', async () => {
     const html = await fetch(`${baseUrl}/`).then((r) => r.text());
     const refs = [...html.matchAll(/(?:src|href)="([^"]+)"/g)]
