@@ -3,24 +3,30 @@
  * Enforce the SecLead risk-acceptance gate.
  *
  * Risk acceptance is a controlled action: a finding may only be accepted when the
- * acceptance is tracked (a `tracking:` reference to a Paperclip issue) and the scanner
- * config is actually wired into CI. This script fails the build when that contract is
- * broken, so an undocumented acceptance cannot merge.
+ * acceptance is tracked (a `tracking:` reference to a Paperclip issue) and the
+ * scanner config is actually wired into CI. This script fails the build when that
+ * contract is broken, so an undocumented acceptance cannot merge.
  *
  * Checks:
- *  1. .trivyignore       every CVE/GHSA entry carries a `# tracking: <PREFIX>-NNN`
- *                        reference, either inline or on the following comment line.
- *  2. ci.yml             the SAST gate step wires `SAST_IGNORE_RULES` and `SAST_THRESHOLD`
- *                        from GitHub variables (otherwise the documented SAST accept path
- *                        is dead config), and this validator itself runs in CI.
+ *  1. .trivyignore                  every CVE/GHSA entry carries a `# tracking: <PREFIX>-NNN`
+ *                                   reference, either inline or on the following comment line.
+ *  2. security/sast-acceptances.json  every SAST acceptance has a `tracking` reference, an
+ *                                   `owner`, a `reason`, and a future `reEval` date. Duplicate
+ *                                   rule ids and expired entries are rejected. A bare repo
+ *                                   variable (SAST_IGNORE_RULES) can no longer accept a rule —
+ *                                   the accept path is commit-tracked only.
+ *  3. ci.yml                        the SAST gate and this validator run in the security job.
  *
  * Usage:
- *   node scripts/validate-risk-acceptance.js [--trivy-ignore .trivyignore] [--workflow .github/workflows/ci.yml]
+ *   node scripts/validate-risk-acceptance.js \
+ *     [--trivy-ignore .trivyignore] [--workflow .github/workflows/ci.yml] \
+ *     [--acceptances security/sast-acceptances.json]
  */
 import { readFileSync, existsSync } from 'node:fs';
 
 const DEFAULT_TRIVY_IGNORE = '.trivyignore';
 const DEFAULT_WORKFLOW = '.github/workflows/ci.yml';
+const DEFAULT_ACCEPTANCES = 'security/sast-acceptances.json';
 
 const args = process.argv.slice(2);
 const opt = (name, fallback) => {
@@ -30,6 +36,7 @@ const opt = (name, fallback) => {
 
 const trivyIgnorePath = opt('trivy-ignore', DEFAULT_TRIVY_IGNORE);
 const workflowPath = opt('workflow', DEFAULT_WORKFLOW);
+const acceptancesPath = opt('acceptances', DEFAULT_ACCEPTANCES);
 
 const errors = [];
 const ok = (msg) => console.log(`  ok  ${msg}`);
@@ -74,22 +81,70 @@ if (existsSync(trivyIgnorePath)) {
   fail(`missing ${trivyIgnorePath}`);
 }
 
-// --- 2. CI wiring of the risk-acceptance knobs ---
+// --- 2. SAST acceptances (commit-tracked file is the source of truth) ---
+if (existsSync(acceptancesPath)) {
+  let acceptances;
+  try {
+    acceptances = JSON.parse(readFileSync(acceptancesPath, 'utf8'));
+  } catch (err) {
+    fail(`cannot parse ${acceptancesPath}: ${err.message}`);
+    acceptances = undefined;
+  }
+  if (acceptances !== undefined) {
+    if (!Array.isArray(acceptances)) {
+      fail(`${acceptancesPath} must be a JSON array of {ruleId, tracking, owner, reason, reEval}.`);
+    } else if (acceptances.length === 0) {
+      ok(`${acceptancesPath} is empty (no SAST acceptances yet)`);
+    } else {
+      const today = new Date().toISOString().slice(0, 10);
+      const seen = new Set();
+      let allOk = true;
+      for (const [idx, entry] of acceptances.entries()) {
+        const pos = `${acceptancesPath} entry #${idx + 1}`;
+        const { ruleId, tracking, owner, reason, reEval } = entry ?? {};
+        if (typeof ruleId !== 'string' || ruleId.length === 0) {
+          fail(`${pos} is missing a "ruleId"`);
+          continue;
+        }
+        if (seen.has(ruleId)) {
+          fail(`${pos}: duplicate rule "${ruleId}" in the acceptances file`);
+          allOk = false;
+        }
+        seen.add(ruleId);
+        if (typeof tracking !== 'string' || !/^[A-Z]+-\d+$/.test(tracking)) {
+          fail(`${pos} ("${ruleId}") is missing a "tracking: <PREFIX>-NNN" reference`);
+          allOk = false;
+        }
+        if (typeof owner !== 'string' || owner.length === 0) {
+          fail(`${pos} ("${ruleId}") is missing an "owner"`);
+          allOk = false;
+        }
+        if (typeof reason !== 'string' || reason.length === 0) {
+          fail(`${pos} ("${ruleId}") is missing a "reason"`);
+          allOk = false;
+        }
+        if (typeof reEval !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(reEval)) {
+          fail(`${pos} ("${ruleId}") has an invalid "reEval" date (expected YYYY-MM-DD)`);
+          allOk = false;
+        } else if (reEval < today) {
+          fail(`${pos} ("${ruleId}") expired on ${reEval} — re-evaluation is due`);
+          allOk = false;
+        }
+      }
+      if (allOk) ok(`${acceptancesPath} is fully tracked and current`);
+    }
+  }
+} else {
+  fail(`missing ${acceptancesPath} — SAST acceptances must be commit-tracked`);
+}
+
+// --- 3. CI wiring ---
 if (existsSync(workflowPath)) {
   const workflow = readFileSync(workflowPath, 'utf8');
-  if (/SAST_IGNORE_RULES/.test(workflow)) {
-    ok('ci.yml wires SAST_IGNORE_RULES into the SAST gate');
+  if (workflow.includes('sarif-gate')) {
+    ok('ci.yml runs the SAST gate (scripts/sarif-gate.js)');
   } else {
-    fail(
-      'ci.yml does not set SAST_IGNORE_RULES — the documented SAST accept path cannot work. Add `SAST_IGNORE_RULES: ${{ vars.SAST_IGNORE_RULES }}` to the gate step env.',
-    );
-  }
-  if (/SAST_THRESHOLD/.test(workflow)) {
-    ok('ci.yml wires SAST_THRESHOLD into the SAST gate');
-  } else {
-    fail(
-      'ci.yml does not set SAST_THRESHOLD — add `SAST_THRESHOLD: ${{ vars.SAST_THRESHOLD }}` to the gate step env.',
-    );
+    fail('ci.yml does not run scripts/sarif-gate.js — add it to the security job.');
   }
   if (workflow.includes('validate-risk-acceptance')) {
     ok('ci.yml runs the risk-acceptance validator');

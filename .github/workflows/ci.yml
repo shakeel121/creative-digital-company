@@ -47,19 +47,16 @@ jobs:
         shell: bash
         run: node scripts/validate-risk-acceptance.js
 
-      - name: SAST (Semgrep, p/ci rules)
+      - name: SAST (Semgrep, p/ci rules, pinned image)
         shell: bash
         run: |
           docker run --rm -v "${{ github.workspace }}:/src" \
-            semgrep/semgrep:latest \
+            semgrep/semgrep:1.172.0 \
             semgrep scan --config p/ci --sarif --output /src/semgrep-report.sarif \
             --exclude node_modules --exclude dist --exclude .git /src || true
 
-      - name: Gate SAST findings (fail on critical/high)
+      - name: Gate SAST findings (fail on critical/high; tracked acceptances only)
         shell: bash
-        env:
-          SAST_IGNORE_RULES: ${{ vars.SAST_IGNORE_RULES }}
-          SAST_THRESHOLD: ${{ vars.SAST_THRESHOLD }}
         run: node scripts/sarif-gate.js semgrep-report.sarif
 
       - name: Upload SAST SARIF

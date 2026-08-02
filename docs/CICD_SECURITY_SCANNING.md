@@ -19,6 +19,7 @@
 | Dependency scan        | Trivy `fs` on lockfile                 | every push/PR                                      | known critical/high (fixed) | DevOpsLead           |
 | Container scan         | Trivy `image` (reusable workflow)      | on image build (M5+)                               | critical/high               | DevOpsLead           |
 | Secret scan (CI)       | Gitleaks                               | every push/PR                                      | any leaked secret           | DevOpsLead           |
+| Secret scan (history)  | Gitleaks `git` (pinned image)          | scheduled Mon 04:00 UTC (`secrets-history.yml`)   | any leaked secret in history| DevOpsLead           |
 | Secret scan (local)    | Gitleaks via `.githooks/pre-commit`    | pre-commit (`git config core.hooksPath .githooks`) | staged secrets              | All devs             |
 | Dependency updates     | Dependabot (npm + GitHub Actions)      | weekly (Mon 06:00 UTC)                             | n/a (opens PRs)             | DevOpsLead           |
 | Security headers       | `scripts/security-headers.js` + vitest | every push/PR + DAST schedule                      | missing/mismatched baseline | DevOpsLead           |
@@ -31,8 +32,9 @@ Findings from all SARIF-producing tools are uploaded to GitHub code scanning
 ## 2. Severity gates and the upgrade policy
 
 - **Blocking threshold:** CVSS/`security-severity` **>= 7.0 (High/Critical)**, or SARIF
-  `level: error` when no numeric severity exists. Implemented in
-  `scripts/sarif-gate.js` (threshold overridable with `SAST_THRESHOLD`).
+  `level: error` when no numeric severity exists. Implemented in `scripts/sarif-gate.js`.
+  The threshold cannot loosen the gate: `SAST_THRESHOLD` below 7.0 fails the build, a
+  non-numeric value fails closed, and a value above 7.0 is clamped back to 7.0.
 - **Dependency/container upgrades:** Dependabot opens weekly PRs; security PRs are merged on
   priority. Trivy runs with `ignore-unfixed: true`, so **unfixed upstream vulnerabilities never
   surface as code-scanning alerts — the weekly sweep's unfixed-backlog scan**
@@ -41,11 +43,13 @@ Findings from all SARIF-producing tools are uploaded to GitHub code scanning
   surfaces them and SecLead tracks them as `track-unfixed`, not silently ignored.
 - **Accepting a risk:** never silence a scanner by editing the lockfile or deleting a report.
   Add the CVE/GHSA id to `.trivyignore` **with** a `# tracking: <PREFIX>-NNN` reference, or
-  exclude a Semgrep rule via `SAST_IGNORE_RULES` (GitHub variable, wired into the `security`
-  job) **with** a justification recorded in the register. Both actions require **SecLead
-  sign-off** per [VULNERABILITY_MANAGEMENT.md §4](/CRE/issues/CRE-68#document-vulnerability-management).
-  `scripts/validate-risk-acceptance.js` (part of the `security` job) fails the build on any
-  untracked acceptance.
+  add a Semgrep rule id to the commit-tracked `security/sast-acceptances.json` (schema in
+  [VULNERABILITY_MANAGEMENT.md §4](/CRE/issues/CRE-68#document-vulnerability-management))
+  **with** a `tracking` reference, an `owner`, a `reason`, and a future `reEval` date.
+  `SAST_IGNORE_RULES` is removed — a repo-settings change must not be able to silence a rule
+  without a reviewed commit. Both actions require **SecLead sign-off**. The `security` job's
+  `scripts/validate-risk-acceptance.js` fails the build on any untracked, duplicate, or
+  expired acceptance.
 - **Red build = merge block.** The `security` job runs on every push/PR; branch protection
   should require it (green `check` + `security`) before merging.
 
